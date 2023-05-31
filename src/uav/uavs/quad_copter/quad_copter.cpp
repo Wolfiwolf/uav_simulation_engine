@@ -18,11 +18,11 @@ QuadCopter::~QuadCopter() {
 void QuadCopter::control_update(float delta_t) {
 	struct Matrix euler_angles = get_orientation_euler_angles_ZYX();
 
-	float Px = 0.1f * euler_angles.rows[0][0];
+	float Px = 0.1f * -euler_angles.rows[0][0];
 	
-	float Py = 0.1f * euler_angles.rows[1][0];
+	float Py = 0.1f * -euler_angles.rows[1][0];
 
-	float Pz = 0.1f * euler_angles.rows[2][0];
+	float Pz = 0.1f * -euler_angles.rows[2][0];
 
 	_actuators["m1"] = _power + Px + Py + Pz;
 	_actuators["m2"] = _power - Px + Py - Pz;
@@ -36,7 +36,7 @@ void QuadCopter::forces_update(float delta_t) {
 
 	force.rows[0][0] = 0.0f;
 	force.rows[1][0] = 0.0f;
-	force.rows[2][0] = -_power * 1.0f;
+	force.rows[2][0] = get_mass() * (_actuators["m1"] + _actuators["m2"] + _actuators["m3"] + _actuators["m4"]);
 
 	add_force(&force);
 

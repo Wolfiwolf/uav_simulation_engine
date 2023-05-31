@@ -51,6 +51,10 @@ void UAV::update(float delta_t) {
 	control_update(delta_t);
 }
 
+float UAV::get_mass() {
+	return _mass;
+}
+
 struct Matrix UAV::get_position() {
 	return _position;
 }

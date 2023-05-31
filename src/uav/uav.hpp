@@ -28,6 +28,8 @@ public:
 
 	void update(float delta_t);
 
+	float get_mass();
+
 	struct Matrix get_position();
 
 	struct Matrix get_velocity();
