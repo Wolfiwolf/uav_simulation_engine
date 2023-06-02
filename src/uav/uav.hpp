@@ -1,8 +1,10 @@
 #pragma once
 
 #include "../uav_math/uav_math.hpp"
+#include "sensor/sensor.hpp"
 #include <unordered_map>
 #include <string>
+#include <vector>
 
 class UAV {
 private:
@@ -21,6 +23,7 @@ private:
 
 protected:
 	std::unordered_map<std::string, float> _actuators;
+	std::vector<Sensor*> _sensors;
 
 public:
 	UAV();
@@ -54,7 +57,5 @@ protected:
 private:
 	void physics_update(float delta_t);
 
-
-
-
+	void sensors_update(float delta_t);
 };

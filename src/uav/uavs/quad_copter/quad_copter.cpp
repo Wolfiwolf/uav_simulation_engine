@@ -9,10 +9,13 @@ QuadCopter::QuadCopter() {
 	_actuators["m2"] = 0.0f;
 	_actuators["m3"] = 0.0f;
 	_actuators["m4"] = 0.0f;
+
+	_gyro_sensor = new GyroSensor(this);
+	_sensors.push_back(_gyro_sensor);
 }
 
 QuadCopter::~QuadCopter() {
-
+	delete _gyro_sensor;
 }
 
 void QuadCopter::control_update(float delta_t) {
