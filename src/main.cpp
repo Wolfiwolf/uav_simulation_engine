@@ -1,9 +1,12 @@
 #include <iostream>
+#include "config_manager/config_manager.hpp"
 #include "streamer/streamer.hpp"
 #include "uav/uavs/quad_copter/quad_copter.hpp"
 #include <chrono>
 
 int main(int argc, char *argv[]) {
+	ConfigManager::init();
+
 	UAV *uav = new QuadCopter();
 
 	Streamer streamer;

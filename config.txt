@@ -1,0 +1,4 @@
+udp_port: 5050
+out_folder: ./logs
+data_link_port: 9000
+
