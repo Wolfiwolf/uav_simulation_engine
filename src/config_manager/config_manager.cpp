@@ -21,7 +21,13 @@ void ConfigManager::init() {
 	config_file.close();
 }
 
-std::string ConfigManager::get_param_val(const std::string &key) {
-	return _params[key];
+bool ConfigManager::get_param_val(const std::string &key, std::string &val) {
+	auto iter = _params.find(key);
+
+	if (iter == _params.end()) 
+		return false;
+
+	val = _params[key];
+	return true; 
 }
 

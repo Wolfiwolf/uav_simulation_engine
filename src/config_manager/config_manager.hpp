@@ -10,6 +10,6 @@ class ConfigManager {
 	public:
 		static void init();
 
-		static std::string get_param_val(const std::string &key);
+		static bool get_param_val(const std::string &key, std::string &val);
 };
 
