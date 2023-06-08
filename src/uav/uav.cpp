@@ -15,6 +15,17 @@ UAV::UAV() {
 		}
 	}
 
+	uav_matrix_init(&_inverse_inertia_matrix, 3, 3);
+
+	for (uint8_t i = 0; i < 3; ++i) {
+		for (uint8_t j = 0; j < 3; ++j) {
+			if (i == j) 
+				_inverse_inertia_matrix.rows[i][j] = 1.0f;
+			else 
+				_inverse_inertia_matrix.rows[i][j] = 0.0f;
+		}
+	}
+
 	uav_matrix_init(&_position, 3, 1);
 	for (uint8_t i = 0; i < 3; ++i) _position.rows[i][0] = 0.0f;
 
@@ -41,7 +52,7 @@ UAV::UAV() {
 UAV::~UAV() {
 }
 
-void UAV::update(float delta_t) {
+void UAV::update(uint64_t t, float delta_t) {
 	sensors_update(delta_t);
 
 	forces_update(delta_t);
@@ -86,7 +97,17 @@ void UAV::add_moment(struct Matrix *moment) {
 }
 
 void UAV::physics_update(float delta_t) {
+	_moments.rows[0][0] = 1.0f;
+	_moments.rows[1][0] = 0.0f;
+	_moments.rows[2][0] = 0.0f;
 
+	update_velocity(delta_t);
+
+	update_position(delta_t);
+
+	update_angular_velocity(delta_t);
+
+	update_orientation(delta_t);
 
 	// CLEAR FORCES AND MOMENTS
 	_forces.rows[0][0] = 0.0f;
@@ -101,4 +122,75 @@ void UAV::physics_update(float delta_t) {
 void UAV::sensors_update(float delta_t) {
 	for (Sensor *sensor : _sensors)
 		sensor->update();
+}
+
+void UAV::update_position(float delta_t) {
+	struct Matrix pos_dot;
+	uav_matrix_init(&pos_dot, 3, 1);
+
+	uav_matrix_copy(&_velocity, &pos_dot);
+
+	uav_matrix_scalar_multiply(&pos_dot, delta_t);
+
+	uav_matrix_add_to(&_position, &pos_dot);
+
+	uav_matrix_destroy(&pos_dot);
+}
+
+void UAV::update_velocity(float delta_t) {
+	struct Matrix velocity_dot;
+	uav_matrix_init(&velocity_dot, 3, 1);
+
+	uav_matrix_copy(&_forces, &velocity_dot);
+
+	uav_matrix_scalar_multiply(&velocity_dot, delta_t / _mass);
+
+	uav_matrix_add_to(&_velocity, &velocity_dot);
+
+	uav_matrix_destroy(&velocity_dot);
+}
+
+void UAV::update_orientation(float delta_t) {
+	struct Matrix q_dot;
+	uav_matrix_init(&q_dot, 4, 1);
+
+	uav_orient_q_dot(&_orientation, &_angular_velocity, &q_dot, delta_t);
+
+	uav_matrix_add_to(&_orientation, &q_dot);
+
+	uav_matrix_destroy(&q_dot);
+
+	float mag = uav_vec_magnitude(&_orientation);
+
+	uav_matrix_scalar_multiply(&_orientation, 1 / mag);
+
+	uav_orient_q_to_euler(&_orientation, &_orientation_euler_angles);
+}
+
+void UAV::update_angular_velocity(float delta_t) {
+	struct Matrix temp1; 
+	uav_matrix_init(&temp1, 3, 1);
+
+	uav_matrix_multiply(&_inertia_matrix, &_angular_velocity, &temp1);
+
+	struct Matrix temp2; 
+	uav_matrix_init(&temp2, 3, 1);
+
+	uav_vec_cross(&_angular_velocity, &temp1, &temp2);
+
+	uav_matrix_scalar_multiply(&temp2, -1);
+	uav_matrix_add_to(&temp2, &_moments);
+
+	struct Matrix temp3; 
+	uav_matrix_init(&temp3, 3, 1);
+
+	uav_matrix_multiply(&_inverse_inertia_matrix, &temp2, &temp3);
+
+	uav_matrix_scalar_multiply(&temp3, delta_t);
+
+	uav_matrix_add_to(&_angular_velocity, &temp3);
+
+	uav_matrix_destroy(&temp1);
+	uav_matrix_destroy(&temp2);
+	uav_matrix_destroy(&temp3);
 }

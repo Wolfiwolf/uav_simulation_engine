@@ -10,6 +10,7 @@ class UAV {
 private:
 	float _mass;
 	struct Matrix _inertia_matrix;
+	struct Matrix _inverse_inertia_matrix;
 
 	struct Matrix _position;
 	struct Matrix _velocity;
@@ -29,7 +30,7 @@ public:
 	UAV();
 	virtual ~UAV() = 0;
 
-	void update(float delta_t);
+	void update(uint64_t t, float delta_t);
 
 	float get_mass();
 
@@ -58,4 +59,12 @@ private:
 	void physics_update(float delta_t);
 
 	void sensors_update(float delta_t);
+
+	void update_position(float delta_t);
+
+	void update_velocity(float delta_t);
+
+	void update_orientation(float delta_t);
+
+	void update_angular_velocity(float delta_t);
 };

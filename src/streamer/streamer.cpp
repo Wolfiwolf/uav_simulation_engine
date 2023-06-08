@@ -14,8 +14,8 @@ Streamer::~Streamer() {
 
 }
 
-void Streamer::stream_data(UAV *uav) {
+void Streamer::stream_data(uint64_t t, UAV *uav) {
 	for (Stream *data_stream : _streams) {
-		data_stream->stream_data(uav);
+		data_stream->stream_data(t, uav);
 	}
 }

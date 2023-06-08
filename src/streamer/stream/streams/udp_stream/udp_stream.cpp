@@ -20,7 +20,7 @@ UDPStream::~UDPStream() {
     close(_sockfd);
 }
 
-void UDPStream::stream_data(UAV *uav) {
+void UDPStream::stream_data(uint64_t t, UAV *uav) {
     int n;
     socklen_t len;
        

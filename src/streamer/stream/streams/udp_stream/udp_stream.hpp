@@ -18,6 +18,6 @@ class UDPStream : public Stream {
 		UDPStream(const std::string &url, uint32_t port);
 		~UDPStream();
 
-		void stream_data(UAV *uav);
+		void stream_data(uint64_t t, UAV *uav);
 };
 

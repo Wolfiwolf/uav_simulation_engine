@@ -12,6 +12,6 @@ class FileStream : public Stream {
 		FileStream(const std::string &out_dir);
 		~FileStream();
 
-		void stream_data(UAV *uav);
+		void stream_data(uint64_t t, UAV *uav);
 };
 

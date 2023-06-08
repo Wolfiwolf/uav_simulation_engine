@@ -11,16 +11,23 @@ int main(int argc, char *argv[]) {
 
 	Streamer streamer;
 
-	auto start_time = std::chrono::high_resolution_clock::now();
-	auto current_time = start_time;
+	auto current_time = std::chrono::high_resolution_clock::now();
 	auto prev_time = current_time;
-	
+
+	uint64_t t = 0;
+
 	while (true) {
-		float delta_time = (float)(std::chrono::duration_cast<std::chrono::microseconds>(current_time - prev_time).count()) / 1000000.0f;
+		current_time = std::chrono::high_resolution_clock::now();
+		uint64_t delta_time_us = std::chrono::duration_cast<std::chrono::microseconds>(current_time - prev_time).count();
+		prev_time = current_time;
+		float delta_time = (float)(delta_time_us) / 1000000.0f;
 
-		uav->update(delta_time);
+		t += delta_time_us;
+		std::cout << delta_time_us << "\n";
 
-		streamer.stream_data(uav);
+		uav->update(t, delta_time);
+
+		streamer.stream_data(t, uav);
 	}
 
 	delete uav;

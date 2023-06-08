@@ -12,6 +12,6 @@ class Streamer {
 		Streamer();
 		~Streamer();
 
-		void stream_data(UAV *uav);
+		void stream_data(uint64_t t, UAV *uav);
 };
 

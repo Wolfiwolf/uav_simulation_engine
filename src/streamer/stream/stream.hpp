@@ -4,6 +4,6 @@
 
 class Stream {
 	public:
-		virtual void stream_data(UAV *uav) = 0;
+		virtual void stream_data(uint64_t t, UAV *uav) = 0;
 };
 

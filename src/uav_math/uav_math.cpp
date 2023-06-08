@@ -1,6 +1,7 @@
 #include "uav_math.hpp"
 #include "stdlib.h"
 #include <math.h>
+#include <iostream>
 
 void uav_matrix_init(struct Matrix *mat, uint8_t M, uint8_t N) {
 	mat->M = M;
@@ -97,6 +98,14 @@ float uav_matrix_min(struct Matrix *mat) {
 
 	return min;
 } 
+
+void uav_matrix_copy(struct Matrix *src, struct Matrix *dest) {
+	for (uint8_t i = 0; i < src->M; ++i) {
+		for (uint8_t j = 0; j < src->N; ++j) 
+			dest->rows[i][j] = src->rows[j][i];
+	}
+} 
+
 
 // VECTOR MATH
 
@@ -233,7 +242,6 @@ void uav_orient_q_dot(struct Matrix *q, struct Matrix *w, struct Matrix *res, fl
 	omega.rows[3][1] = wy;
 	omega.rows[3][2] = -wx;
 	omega.rows[3][3] = 0.0f;
-
 
 	uav_matrix_multiply(&omega, q, res);
 	uav_matrix_scalar_multiply(res, 0.5f * delta_t_sec);
