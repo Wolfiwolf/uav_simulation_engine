@@ -32,6 +32,8 @@ public:
 
 	void update(uint64_t t, float delta_t);
 
+	virtual void handle_gs_bytes(uint8_t *bytes, uint32_t len) = 0;
+
 	float get_mass();
 
 	struct Matrix get_position();
@@ -43,6 +45,7 @@ public:
 	struct Matrix get_orientation_q();
 
 	struct Matrix get_orientation_euler_angles_ZYX();
+
 
 protected:
 	virtual void control_update(float delta_t) = 0;

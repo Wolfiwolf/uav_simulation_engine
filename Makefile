@@ -10,10 +10,9 @@ TARGET=uav_simulation_engine
 $(TARGET): $(OBJS)
 	g++ -o $(TARGET) $(OBJS) 
 
-
 $(BLD_DIR)/%.cpp.o: %.cpp $(INCS)
 	@mkdir -p $(@D)
-	g++ -c $< -o $@  -lm -std=c++11
+	g++ -c $< -o $@  -lpthread -lm -std=c++11
 
 clean:
 	rm -rf $(BLD_DIR)

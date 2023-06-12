@@ -11,6 +11,8 @@ class QuadCopter : public UAV {
 		QuadCopter();
 		~QuadCopter();
 
+		void handle_gs_bytes(uint8_t *bytes, uint32_t len);
+
 	protected:
 		void control_update(float delta_t);
 

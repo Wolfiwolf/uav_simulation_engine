@@ -58,3 +58,7 @@ void QuadCopter::moments_update(float delta_t) {
 
 	uav_matrix_destroy(&moment);
 }
+
+void QuadCopter::handle_gs_bytes(uint8_t *bytes, uint32_t len) {
+
+}
