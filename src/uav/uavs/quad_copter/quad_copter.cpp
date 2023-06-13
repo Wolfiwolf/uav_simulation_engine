@@ -5,8 +5,8 @@
 QuadCopter::QuadCopter() {
 	_power = 0.0f;
 
-	_actuators["m1"] = 0.0f;
-	_actuators["m2"] = 0.0f;
+	_actuators["m1"] = 1.0f;
+	_actuators["m2"] = 1.0f;
 	_actuators["m3"] = 0.0f;
 	_actuators["m4"] = 0.0f;
 
@@ -27,10 +27,12 @@ void QuadCopter::control_update(float delta_t) {
 
 	float Pz = 0.1f * -euler_angles.rows[2][0];
 
+	/*
 	_actuators["m1"] = _power + Px + Py + Pz;
 	_actuators["m2"] = _power - Px + Py - Pz;
 	_actuators["m3"] = _power - Px - Py + Pz;
 	_actuators["m4"] = _power + Px - Py - Pz;
+	*/
 }
 
 void QuadCopter::forces_update(float delta_t) {
@@ -50,12 +52,46 @@ void QuadCopter::moments_update(float delta_t) {
 	struct Matrix moment;
 	uav_matrix_init(&moment, 3, 1);
 
-	moment.rows[0][0] = (_actuators["m1"] + _actuators["m4"]) - (_actuators["m2"] + _actuators["m3"]);
-	moment.rows[1][0] = (_actuators["m1"] + _actuators["m2"]) - (_actuators["m3"] + _actuators["m4"]);
-	moment.rows[2][0] = (_actuators["m1"] + _actuators["m3"]) - (_actuators["m2"] + _actuators["m4"]);
+	moment.rows[0][0] = 0.0f;
+	moment.rows[1][0] = 0.0f;
+	moment.rows[2][0] = 0.0f;
 
+	struct Matrix m_moment;
+	uav_matrix_init(&m_moment, 3, 1);
+
+	float mass = get_mass();
+
+	// M1 MOMENT
+	m_moment.rows[0][0] = 0.3f * (mass * _actuators["m1"]);
+	m_moment.rows[1][0] = 0.3f * (mass * _actuators["m1"]);
+	m_moment.rows[3][0] = 0.0f;
+
+	uav_matrix_add_to(&moment, &m_moment);
+
+	// M2 MOMENT
+	m_moment.rows[0][0] = -0.3f * (mass * _actuators["m2"]);
+	m_moment.rows[1][0] = 0.3f * (mass * _actuators["m2"]);
+	m_moment.rows[3][0] = 0.0f;
+
+	uav_matrix_add_to(&moment, &m_moment);
+
+	// M3 MOMENT
+	m_moment.rows[0][0] = -0.3f * (mass * _actuators["m3"]);
+	m_moment.rows[1][0] = -0.3f * (mass * _actuators["m3"]);
+	m_moment.rows[3][0] = 0.0f;
+
+	uav_matrix_add_to(&moment, &m_moment);
+
+	// M4 MOMENT
+	m_moment.rows[0][0] = -0.3f * (mass * _actuators["m4"]);
+	m_moment.rows[1][0] = 0.3f * (mass * _actuators["m4"]);
+	m_moment.rows[3][0] = 0.0f;
+
+	uav_matrix_add_to(&moment, &m_moment);
+	
 	add_moment(&moment);
 
+	uav_matrix_destroy(&m_moment);
 	uav_matrix_destroy(&moment);
 }
 

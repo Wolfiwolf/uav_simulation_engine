@@ -102,7 +102,7 @@ float uav_matrix_min(struct Matrix *mat) {
 void uav_matrix_copy(struct Matrix *src, struct Matrix *dest) {
 	for (uint8_t i = 0; i < src->M; ++i) {
 		for (uint8_t j = 0; j < src->N; ++j) 
-			dest->rows[i][j] = src->rows[j][i];
+			dest->rows[i][j] = src->rows[i][j];
 	}
 } 
 

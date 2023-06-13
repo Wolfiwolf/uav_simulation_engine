@@ -97,9 +97,7 @@ void UAV::add_moment(struct Matrix *moment) {
 }
 
 void UAV::physics_update(float delta_t) {
-	_moments.rows[0][0] = 1.0f;
-	_moments.rows[1][0] = 0.0f;
-	_moments.rows[2][0] = 0.0f;
+	// _forces.rows[2][0] = -9.8f * _mass;
 
 	update_velocity(delta_t);
 
@@ -158,13 +156,13 @@ void UAV::update_orientation(float delta_t) {
 
 	uav_matrix_add_to(&_orientation, &q_dot);
 
-	uav_matrix_destroy(&q_dot);
-
 	float mag = uav_vec_magnitude(&_orientation);
 
 	uav_matrix_scalar_multiply(&_orientation, 1 / mag);
 
 	uav_orient_q_to_euler(&_orientation, &_orientation_euler_angles);
+
+	uav_matrix_destroy(&q_dot);
 }
 
 void UAV::update_angular_velocity(float delta_t) {
@@ -193,4 +191,5 @@ void UAV::update_angular_velocity(float delta_t) {
 	uav_matrix_destroy(&temp1);
 	uav_matrix_destroy(&temp2);
 	uav_matrix_destroy(&temp3);
+
 }

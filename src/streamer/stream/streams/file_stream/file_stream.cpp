@@ -11,6 +11,10 @@ FileStream::~FileStream() {
 
 void FileStream::stream_data(uint64_t t, UAV *uav) {
 	_out_file << t << "\n";
+	_out_file << uav->get_position().rows[0][0] << "\n";
+	_out_file << uav->get_position().rows[1][0] << "\n";
+	_out_file << uav->get_position().rows[2][0] << "\n";
+
 	_out_file << uav->get_angular_velocity().rows[0][0] << "\n";
 	_out_file << uav->get_angular_velocity().rows[1][0] << "\n";
 	_out_file << uav->get_angular_velocity().rows[2][0] << "\n";

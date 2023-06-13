@@ -1,3 +1,4 @@
+#include <cmath>
 #include <iostream>
 #include "config_manager/config_manager.hpp"
 #include "streamer/streamer.hpp"
@@ -48,7 +49,6 @@ void run_simulation(UAV *uav, DataLink *data_link) {
 		float delta_time = (float)(delta_time_us) / 1000000.0f;
 
 		t += delta_time_us;
-		std::cout << delta_time_us << "\n";
 
 		uav->update(t, delta_time);
 
