@@ -64,28 +64,28 @@ void QuadCopter::moments_update(float delta_t) {
 	// M1 MOMENT
 	m_moment.rows[0][0] = 0.3f * (mass * _actuators["m1"]);
 	m_moment.rows[1][0] = 0.3f * (mass * _actuators["m1"]);
-	m_moment.rows[3][0] = 0.0f;
+	m_moment.rows[2][0] = 0.0f;
 
 	uav_matrix_add_to(&moment, &m_moment);
 
 	// M2 MOMENT
 	m_moment.rows[0][0] = -0.3f * (mass * _actuators["m2"]);
 	m_moment.rows[1][0] = 0.3f * (mass * _actuators["m2"]);
-	m_moment.rows[3][0] = 0.0f;
+	m_moment.rows[2][0] = 0.0f;
 
 	uav_matrix_add_to(&moment, &m_moment);
 
 	// M3 MOMENT
 	m_moment.rows[0][0] = -0.3f * (mass * _actuators["m3"]);
 	m_moment.rows[1][0] = -0.3f * (mass * _actuators["m3"]);
-	m_moment.rows[3][0] = 0.0f;
+	m_moment.rows[2][0] = 0.0f;
 
 	uav_matrix_add_to(&moment, &m_moment);
 
 	// M4 MOMENT
 	m_moment.rows[0][0] = -0.3f * (mass * _actuators["m4"]);
 	m_moment.rows[1][0] = 0.3f * (mass * _actuators["m4"]);
-	m_moment.rows[3][0] = 0.0f;
+	m_moment.rows[2][0] = 0.0f;
 
 	uav_matrix_add_to(&moment, &m_moment);
 	

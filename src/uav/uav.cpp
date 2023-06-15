@@ -98,6 +98,8 @@ void UAV::add_moment(struct Matrix *moment) {
 
 void UAV::physics_update(float delta_t) {
 	// _forces.rows[2][0] = -9.8f * _mass;
+	
+	uav_rotation_body_to_inertial(&_forces, &_orientation_euler_angles);
 
 	update_velocity(delta_t);
 
