@@ -1,14 +1,14 @@
-
 #include "quad_copter.hpp"
+#include <cstdlib>
 #include <iostream>
 
 QuadCopter::QuadCopter() {
-	_power = 0.0f;
+	_power = 0.3f;
 
-	_actuators["m1"] = 1.0f;
-	_actuators["m2"] = 1.0f;
-	_actuators["m3"] = 0.0f;
-	_actuators["m4"] = 0.0f;
+	_actuators["m1"] = 0.2f;
+	_actuators["m2"] = 0.2f;
+	_actuators["m3"] = 0.2f;
+	_actuators["m4"] = 0.2f;
 
 	_gyro_sensor = new GyroSensor(this);
 	_sensors.push_back(_gyro_sensor);
@@ -21,18 +21,14 @@ QuadCopter::~QuadCopter() {
 void QuadCopter::control_update(float delta_t) {
 	struct Matrix euler_angles = get_orientation_euler_angles_ZYX();
 
-	float Px = 0.1f * -euler_angles.rows[0][0];
+	float Px = 30.0f * -euler_angles.rows[0][0];
 	
-	float Py = 0.1f * -euler_angles.rows[1][0];
+	float Py = 30.0f * -euler_angles.rows[1][0];
 
-	float Pz = 0.1f * -euler_angles.rows[2][0];
-
-	/*
-	_actuators["m1"] = _power + Px + Py + Pz;
-	_actuators["m2"] = _power - Px + Py - Pz;
-	_actuators["m3"] = _power - Px - Py + Pz;
-	_actuators["m4"] = _power + Px - Py - Pz;
-	*/
+	_actuators["m1"] = _power + Px + Py;
+	_actuators["m2"] = _power - Px + Py;
+	_actuators["m3"] = _power - Px - Py;
+	_actuators["m4"] = _power + Px - Py;
 }
 
 void QuadCopter::forces_update(float delta_t) {
@@ -41,7 +37,7 @@ void QuadCopter::forces_update(float delta_t) {
 
 	force.rows[0][0] = 0.0f;
 	force.rows[1][0] = 0.0f;
-	force.rows[2][0] = get_mass() * (_actuators["m1"] + _actuators["m2"] + _actuators["m3"] + _actuators["m4"]);
+	force.rows[2][0] = (get_mass() * 9.8f) * (_actuators["m1"] + _actuators["m2"] + _actuators["m3"] + _actuators["m4"]);
 
 	add_force(&force);
 
@@ -66,6 +62,7 @@ void QuadCopter::moments_update(float delta_t) {
 	m_moment.rows[1][0] = 0.3f * (mass * _actuators["m1"]);
 	m_moment.rows[2][0] = 0.0f;
 
+
 	uav_matrix_add_to(&moment, &m_moment);
 
 	// M2 MOMENT
@@ -83,9 +80,19 @@ void QuadCopter::moments_update(float delta_t) {
 	uav_matrix_add_to(&moment, &m_moment);
 
 	// M4 MOMENT
-	m_moment.rows[0][0] = -0.3f * (mass * _actuators["m4"]);
-	m_moment.rows[1][0] = 0.3f * (mass * _actuators["m4"]);
+	m_moment.rows[0][0] = 0.3f * (mass * _actuators["m4"]);
+	m_moment.rows[1][0] = -0.3f * (mass * _actuators["m4"]);
 	m_moment.rows[2][0] = 0.0f;
+
+	uav_matrix_add_to(&moment, &m_moment);
+
+	// NOISE
+	float amplitude = 10.0f;
+	m_moment.rows[0][0] = ((rand() % 100) / 100.0f) * amplitude + -(amplitude / 2.0f);
+	m_moment.rows[1][0] = ((rand() % 100) / 100.0f) * amplitude + -(amplitude / 2.0f);
+	m_moment.rows[2][0] = 0.0f;
+
+	print_matrix(&m_moment);
 
 	uav_matrix_add_to(&moment, &m_moment);
 	

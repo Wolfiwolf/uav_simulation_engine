@@ -53,6 +53,13 @@ void run_simulation(UAV *uav, DataLink *data_link) {
 		uav->update(t, delta_time);
 
 		streamer.stream_data(t, uav);
+
+		const struct Matrix pos = uav->get_position();
+
+		std::cout << "#########\n";
+		std::cout << pos.rows[0][0] << "\n";
+		std::cout << pos.rows[1][0] << "\n";
+		std::cout << pos.rows[2][0] << "\n";
 	}
 }
 

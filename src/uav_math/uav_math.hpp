@@ -9,6 +9,8 @@ struct Matrix {
 	float **rows;
 };
 
+void print_matrix(struct Matrix *m);
+
 void uav_matrix_init(struct Matrix *mat, uint8_t M, uint8_t N); 
 
 void uav_matrix_destroy(struct Matrix *mat);

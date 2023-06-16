@@ -35,6 +35,7 @@ UAV::UAV() {
 	uav_matrix_init(&_angular_velocity, 3, 1);
 	for (uint8_t i = 0; i < 3; ++i) _angular_velocity.rows[i][0] = 0.0f;
 
+
 	uav_matrix_init(&_orientation, 4, 1);
 	_orientation.rows[0][0] = 1.0f;
 	for (uint8_t i = 1; i < 4; ++i) _orientation.rows[i][0] = 0.0f;
@@ -54,13 +55,9 @@ UAV::~UAV() {
 
 void UAV::update(uint64_t t, float delta_t) {
 	sensors_update(delta_t);
-
 	forces_update(delta_t);
-
 	moments_update(delta_t);
-
 	physics_update(delta_t);
-
 	control_update(delta_t);
 }
 
@@ -97,9 +94,10 @@ void UAV::add_moment(struct Matrix *moment) {
 }
 
 void UAV::physics_update(float delta_t) {
-	// _forces.rows[2][0] = -9.8f * _mass;
-	
+
 	uav_rotation_body_to_inertial(&_forces, &_orientation_euler_angles);
+
+	_forces.rows[2][0] = _forces.rows[2][0] - 9.8f * _mass;
 
 	update_velocity(delta_t);
 
@@ -135,6 +133,7 @@ void UAV::update_position(float delta_t) {
 	uav_matrix_add_to(&_position, &pos_dot);
 
 	uav_matrix_destroy(&pos_dot);
+
 }
 
 void UAV::update_velocity(float delta_t) {

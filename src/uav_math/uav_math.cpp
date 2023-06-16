@@ -3,6 +3,16 @@
 #include <math.h>
 #include <iostream>
 
+void print_matrix(struct Matrix *m) {
+	for (uint8_t i = 0; i < m->M; ++i) {
+		std::cout << "| ";
+		for (uint8_t j = 0; j < m->N; ++j) {
+			std::cout << m->rows[i][j] << " ";
+		}
+		std::cout << "|\n";
+	}
+}
+
 void uav_matrix_init(struct Matrix *mat, uint8_t M, uint8_t N) {
 	mat->M = M;
 	mat->N = N;
@@ -146,7 +156,7 @@ void uav_vec_differential(struct Matrix *vec, struct Matrix *w, struct Matrix *r
 
 // ROTATIONS MATH
 
-void uav_rotation_inertial_to_body(struct Matrix *vec, struct Matrix *euler_angles) {
+void uav_rotation_body_to_inertial(struct Matrix *vec, struct Matrix *euler_angles) {
 	struct Matrix Rx;
 	uav_matrix_init(&Rx, 3, 3);
 	struct Matrix Ry;
@@ -209,6 +219,8 @@ void uav_rotation_inertial_to_body(struct Matrix *vec, struct Matrix *euler_angl
 	Rz.rows[2][2] = 1.0f;
 
 	uav_matrix_multiply(&Ry, &Rx, &Rxy);
+
+
 	uav_matrix_multiply(&Rz, &Rxy, &R);
 
 	uav_matrix_transpose(&R, &Rt);
@@ -224,9 +236,10 @@ void uav_rotation_inertial_to_body(struct Matrix *vec, struct Matrix *euler_angl
 	uav_matrix_destroy(&R);
 	uav_matrix_destroy(&Rt);
 	uav_matrix_destroy(&temp_vec);
+
 }
 
-void uav_rotation_body_to_inertial(struct Matrix *vec, struct Matrix *euler_angles) {
+void uav_rotation_inertial_to_body(struct Matrix *vec, struct Matrix *euler_angles) {
 	struct Matrix Rx;
 	uav_matrix_init(&Rx, 3, 3);
 	struct Matrix Ry;
@@ -288,6 +301,7 @@ void uav_rotation_body_to_inertial(struct Matrix *vec, struct Matrix *euler_angl
 
 
 	uav_matrix_multiply(&Ry, &Rx, &Rxy);
+
 	uav_matrix_multiply(&Rz, &Rxy, &R);
 
 	uav_matrix_multiply(&R, vec, &temp_vec);
@@ -366,6 +380,9 @@ void uav_orient_q_to_euler(struct Matrix *q, struct Matrix *euler_angles) {
 	float C13 = 2.0f * (qx * qz - qy * qs);
 	float C12 = 2.0f * (qx * qy + qz * qs);
 	float C11 = qs * qs + qx * qx - qy * qy - qz * qz;
+
+	if (C13 >= 1.0f) C13 = 1.0f;
+	else if (C13 <= -1.0f) C13 = -1.0f;
 
 	euler_angles->rows[0][0] = atan2f(C23, C33);
 	euler_angles->rows[1][0] = -asinf(C13);
