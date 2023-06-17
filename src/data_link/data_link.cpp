@@ -7,8 +7,7 @@
 #include <unistd.h>
 #include <iostream>
 
-DataLink::DataLink(UAV *uav, int port) {
-	_uav = uav;
+DataLink::DataLink(int port) {
 	_port = port;
 }
 

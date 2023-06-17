@@ -1,5 +1,6 @@
 #include "uav.hpp"
 #include <iostream>
+#include "../config_manager/config_manager.hpp"
 
 UAV::UAV() {
 	_mass = 1.0f;
@@ -9,7 +10,7 @@ UAV::UAV() {
 	for (uint8_t i = 0; i < 3; ++i) {
 		for (uint8_t j = 0; j < 3; ++j) {
 			if (i == j) 
-				_inertia_matrix.rows[i][j] = 1.0f;
+				_inertia_matrix.rows[i][j] = 0.01f;
 			else 
 				_inertia_matrix.rows[i][j] = 0.0f;
 		}
@@ -20,7 +21,7 @@ UAV::UAV() {
 	for (uint8_t i = 0; i < 3; ++i) {
 		for (uint8_t j = 0; j < 3; ++j) {
 			if (i == j) 
-				_inverse_inertia_matrix.rows[i][j] = 1.0f;
+				_inverse_inertia_matrix.rows[i][j] = 1 / 0.01f;
 			else 
 				_inverse_inertia_matrix.rows[i][j] = 0.0f;
 		}
@@ -35,10 +36,14 @@ UAV::UAV() {
 	uav_matrix_init(&_angular_velocity, 3, 1);
 	for (uint8_t i = 0; i < 3; ++i) _angular_velocity.rows[i][0] = 0.0f;
 
-
 	uav_matrix_init(&_orientation, 4, 1);
 	_orientation.rows[0][0] = 1.0f;
 	for (uint8_t i = 1; i < 4; ++i) _orientation.rows[i][0] = 0.0f;
+
+	_orientation.rows[0][0] = 0.762f;
+	_orientation.rows[1][0] = 0.425f;
+	_orientation.rows[2][0] = 0.425f;
+	_orientation.rows[3][0] = -0.2373f;
 
 	uav_matrix_init(&_orientation_euler_angles, 3, 1);
 	for (uint8_t i = 0; i < 3; ++i) _orientation_euler_angles.rows[i][0] = 0.0f;
@@ -48,9 +53,19 @@ UAV::UAV() {
 
 	uav_matrix_init(&_moments, 3, 1);
 	for (uint8_t i = 0; i < 3; ++i) _moments.rows[i][0] = 0.0f;
+
+	std::string url;
+	ConfigManager::get_param_val("data_link_url", url);
+
+	std::string port_str;
+	ConfigManager::get_param_val("data_link_port", port_str);
+	int port = std::stoi(port_str);
+
+	_data_link = new DataLink(port);
 }
 
 UAV::~UAV() {
+	delete _data_link;
 }
 
 void UAV::update(uint64_t t, float delta_t) {

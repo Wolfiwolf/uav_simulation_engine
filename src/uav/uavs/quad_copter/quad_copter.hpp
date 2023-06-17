@@ -7,11 +7,12 @@ class QuadCopter : public UAV {
 		float _power;
 		GyroSensor *_gyro_sensor;
 
+		float _target_altitude;
 	public:
 		QuadCopter();
 		~QuadCopter();
 
-		void handle_gs_bytes(uint8_t *bytes, uint32_t len);
+		void communication_thread();
 
 	protected:
 		void control_update(float delta_t);
