@@ -21,6 +21,10 @@ UAV::UAV() {
 
 		for (; i < pos_str.size(); ++i) num += pos_str[i];
 		_alt = std::stof(num);
+
+		_start_lat = _lat;
+		_start_lon = _lon;
+		_start_alt = _alt;
 	}
 
 	_mass = 1.0f;
@@ -162,8 +166,22 @@ void UAV::update_position(float delta_t) {
 	uav_matrix_scalar_multiply(&pos_dot, delta_t);
 
 	uav_matrix_add_to(&_position, &pos_dot);
+	
+	if (_position.rows[2][0] < 0.0f) _position.rows[2][0] = 0.0f;
 
 	uav_matrix_destroy(&pos_dot);
+
+	float x, y, z;
+	float x_r, y_r, z_r;
+	uav_trans_geodetic_to_ECEF(_start_lat, _start_lon, _start_alt, &x_r, &y_r, &z_r);
+
+	uav_trans_ENU_to_ECEF(
+			_position.rows[0][0], _position.rows[1][0], _position.rows[2][0], 
+			_start_lat, _start_lon, 
+			x_r, y_r, z_r, 
+			&x, &y, &z);
+
+	uav_trans_ECEF_to_geodetic(x, y, z, &_lat, &_lon, &_alt);
 }
 
 void UAV::update_velocity(float delta_t) {

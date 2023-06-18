@@ -22,6 +22,11 @@ class UAV {
 		struct Matrix _forces;
 		struct Matrix _moments;
 
+
+		float _start_lat;
+		float _start_lon;
+		float _start_alt;
+
 		float _lat;
 		float _lon;
 		float _alt;
