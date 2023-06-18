@@ -10,7 +10,7 @@ UAV::UAV() {
 	for (uint8_t i = 0; i < 3; ++i) {
 		for (uint8_t j = 0; j < 3; ++j) {
 			if (i == j) 
-				_inertia_matrix.rows[i][j] = 0.01f;
+				_inertia_matrix.rows[i][j] = 0.1f;
 			else 
 				_inertia_matrix.rows[i][j] = 0.0f;
 		}
@@ -21,7 +21,7 @@ UAV::UAV() {
 	for (uint8_t i = 0; i < 3; ++i) {
 		for (uint8_t j = 0; j < 3; ++j) {
 			if (i == j) 
-				_inverse_inertia_matrix.rows[i][j] = 1 / 0.01f;
+				_inverse_inertia_matrix.rows[i][j] = 1 / 0.1f;
 			else 
 				_inverse_inertia_matrix.rows[i][j] = 0.0f;
 		}
@@ -36,17 +36,13 @@ UAV::UAV() {
 	uav_matrix_init(&_angular_velocity, 3, 1);
 	for (uint8_t i = 0; i < 3; ++i) _angular_velocity.rows[i][0] = 0.0f;
 
-	uav_matrix_init(&_orientation, 4, 1);
-	_orientation.rows[0][0] = 1.0f;
-	for (uint8_t i = 1; i < 4; ++i) _orientation.rows[i][0] = 0.0f;
-
-	_orientation.rows[0][0] = 0.762f;
-	_orientation.rows[1][0] = 0.425f;
-	_orientation.rows[2][0] = 0.425f;
-	_orientation.rows[3][0] = -0.2373f;
-
 	uav_matrix_init(&_orientation_euler_angles, 3, 1);
-	for (uint8_t i = 0; i < 3; ++i) _orientation_euler_angles.rows[i][0] = 0.0f;
+	_orientation_euler_angles.rows[0][0] = 45.0f;
+	_orientation_euler_angles.rows[1][0] = 45.0f;
+	_orientation_euler_angles.rows[2][0] = 45.0f;
+
+	uav_matrix_init(&_orientation, 4, 1);
+	uav_orient_euler_to_q(&_orientation_euler_angles, &_orientation);
 
 	uav_matrix_init(&_forces, 3, 1);
 	for (uint8_t i = 0; i < 3; ++i) _forces.rows[i][0] = 0.0f;

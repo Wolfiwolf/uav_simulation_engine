@@ -23,13 +23,13 @@ QuadCopter::~QuadCopter() {
 void QuadCopter::control_update(float delta_t) {
 	static float prev_x = 0.0f;
 	static float prev_y = 0.0f;
+	static float prev_z = 0.0f;
 
 	static float prev_pow = 0.0f;
 	static float I = 0.0f;
 
 	struct Matrix euler_angles = get_orientation_euler_angles_ZYX();
 	struct Matrix pos = get_position();
-	std::cout << pos.rows[2][0] << "\n";
 
 	float Px = 0.5f * -euler_angles.rows[0][0];
 	float Dx = 1000.0f * (prev_x - euler_angles.rows[0][0]);
@@ -39,6 +39,10 @@ void QuadCopter::control_update(float delta_t) {
 	float Dy = 1000.0f * (prev_y - euler_angles.rows[1][0]);
 	prev_y = euler_angles.rows[1][0];
 
+	float Pz = 0.4f * -euler_angles.rows[2][0];
+	float Dz = 8000.0f * (prev_z - euler_angles.rows[2][0]);
+	prev_z = euler_angles.rows[2][0];
+
 	float Ppower = 4.0f * (_target_altitude - pos.rows[2][0]);
 	float Dpower = 200000.0f * (prev_pow - pos.rows[2][0]);
 	prev_pow = pos.rows[2][0];
@@ -47,10 +51,10 @@ void QuadCopter::control_update(float delta_t) {
 	if (power_gain > 0.4) power_gain = 0.4f;
 	else if (power_gain < -0.4) power_gain = -0.4f;
 
-	float m1 = _power + power_gain + (Px + Dx) + (Py + Dy);
-	float m2 = _power + power_gain - (Px + Dx) + (Py + Dy);
-	float m3 = _power + power_gain - (Px + Dx) - (Py + Dy);
-	float m4 = _power + power_gain + (Px + Dx) - (Py + Dy);
+	float m1 = _power + power_gain + (Px + Dx) + (Py + Dy) + (Pz + Dz);
+	float m2 = _power + power_gain - (Px + Dx) + (Py + Dy) - (Pz + Dz);
+	float m3 = _power + power_gain - (Px + Dx) - (Py + Dy) + (Pz + Dz);
+	float m4 = _power + power_gain + (Px + Dx) - (Py + Dy) - (Pz + Dz);
 
 	if (m1 < 0.0f) m1 = 0.0f;
 	if (m1 > 1.0f) m1 = 1.0f;
@@ -97,31 +101,30 @@ void QuadCopter::moments_update(float delta_t) {
 	float mass = get_mass();
 
 	// M1 MOMENT
-	m_moment.rows[0][0] = 0.3f * (mass * _actuators["m1"]);
-	m_moment.rows[1][0] = 0.3f * (mass * _actuators["m1"]);
-	m_moment.rows[2][0] = 0.0f;
-
+	m_moment.rows[0][0] = 0.3f * ((mass * 9.8f) * _actuators["m1"]);
+	m_moment.rows[1][0] = 0.3f * ((mass * 9.8f) * _actuators["m1"]);
+	m_moment.rows[2][0] = 0.5f * _actuators["m1"];
 
 	uav_matrix_add_to(&moment, &m_moment);
 
 	// M2 MOMENT
-	m_moment.rows[0][0] = -0.3f * (mass * _actuators["m2"]);
-	m_moment.rows[1][0] = 0.3f * (mass * _actuators["m2"]);
-	m_moment.rows[2][0] = 0.0f;
+	m_moment.rows[0][0] = -0.3f * ((mass * 9.8f) * _actuators["m2"]);
+	m_moment.rows[1][0] = 0.3f * ((mass * 9.8f) * _actuators["m2"]);
+	m_moment.rows[2][0] = -0.5f * _actuators["m2"];
 
 	uav_matrix_add_to(&moment, &m_moment);
 
 	// M3 MOMENT
-	m_moment.rows[0][0] = -0.3f * (mass * _actuators["m3"]);
-	m_moment.rows[1][0] = -0.3f * (mass * _actuators["m3"]);
-	m_moment.rows[2][0] = 0.0f;
+	m_moment.rows[0][0] = -0.3f * ((mass * 9.8f) * _actuators["m3"]);
+	m_moment.rows[1][0] = -0.3f * ((mass * 9.8f) * _actuators["m3"]);
+	m_moment.rows[2][0] = 0.5f * _actuators["m3"];
 
 	uav_matrix_add_to(&moment, &m_moment);
 
 	// M4 MOMENT
-	m_moment.rows[0][0] = 0.3f * (mass * _actuators["m4"]);
-	m_moment.rows[1][0] = -0.3f * (mass * _actuators["m4"]);
-	m_moment.rows[2][0] = 0.0f;
+	m_moment.rows[0][0] = 0.3f * ((mass * 9.8f) * _actuators["m4"]);
+	m_moment.rows[1][0] = -0.3f * ((mass * 9.8f) * _actuators["m4"]);
+	m_moment.rows[2][0] = -0.5f * _actuators["m4"];
 
 	uav_matrix_add_to(&moment, &m_moment);
 

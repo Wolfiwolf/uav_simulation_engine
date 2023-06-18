@@ -8,6 +8,7 @@ class QuadCopter : public UAV {
 		GyroSensor *_gyro_sensor;
 
 		float _target_altitude;
+		struct Matrix _target_orientation;
 	public:
 		QuadCopter();
 		~QuadCopter();
