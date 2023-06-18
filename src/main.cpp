@@ -13,7 +13,6 @@ void run_simulation(UAV *uav);
 int main(int argc, char *argv[]) {
 	ConfigManager::init();
 
-
 	UAV *uav;
 	uav = new QuadCopter();
 

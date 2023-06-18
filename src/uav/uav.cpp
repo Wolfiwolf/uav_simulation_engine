@@ -1,8 +1,28 @@
 #include "uav.hpp"
 #include <iostream>
+#include <string>
 #include "../config_manager/config_manager.hpp"
 
 UAV::UAV() {
+	{
+		std::string pos_str;
+		ConfigManager::get_param_val("uav_initial_position", pos_str);
+		std::string num("");
+
+		uint8_t i = 0;
+		for (; pos_str[i] != ' '; ++i) num += pos_str[i];
+		_lat = std::stof(num);
+		num = "";
+		++i;
+
+		for (; pos_str[i] != ' '; ++i) num += pos_str[i];
+		_lon = std::stof(num);
+		num = "";
+
+		for (; i < pos_str.size(); ++i) num += pos_str[i];
+		_alt = std::stof(num);
+	}
+
 	_mass = 1.0f;
 
 	uav_matrix_init(&_inertia_matrix, 3, 3);
@@ -144,7 +164,6 @@ void UAV::update_position(float delta_t) {
 	uav_matrix_add_to(&_position, &pos_dot);
 
 	uav_matrix_destroy(&pos_dot);
-
 }
 
 void UAV::update_velocity(float delta_t) {

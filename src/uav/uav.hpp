@@ -22,6 +22,10 @@ class UAV {
 		struct Matrix _forces;
 		struct Matrix _moments;
 
+		float _lat;
+		float _lon;
+		float _alt;
+
 
 	protected:
 		DataLink *_data_link;

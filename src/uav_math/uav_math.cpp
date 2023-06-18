@@ -422,3 +422,93 @@ void uav_orient_q_dot(struct Matrix *q, struct Matrix *w, struct Matrix *res, fl
 
 	uav_matrix_destroy(&omega);
 }
+
+// COORDINATE SYSTEM TRANSFORMATIONS
+
+#define DEG_TO_RAD 0.0174532925
+#define RAD_TO_DEG 57.2957795
+#define WGS84_A 6378137.0f
+#define WGS84_E 0.0818191908426f
+
+void uav_trans_geodetic_to_ECEF(float lat, float lon, float alt, float *x, float *y, float *z) {
+    double clat = cos(lat * DEG_TO_RAD);
+    double slat = sin(lat * DEG_TO_RAD);
+    double clon = cos(lon * DEG_TO_RAD);
+    double slon = sin(lon * DEG_TO_RAD);
+
+    double N = WGS84_A / sqrt(1.0 - WGS84_E * WGS84_E * slat * slat);
+
+    *x = (N + alt) * clat * clon;
+    *y = (N + alt) * clat * slon;
+    *z = (N * (1.0 - WGS84_E * WGS84_E) + alt) * slat;
+}
+
+void uav_trans_ECEF_to_geodetic(float x, float y, float z, float *lat, float *lon, float *alt) {
+    // WGS84 constants
+    double a = 6378137.0;
+    double f = 1.0 / 298.257223563;
+
+    // Derived constants
+    double b = a - f * a;
+    double e = sqrt(pow(a, 2.0) - pow(b, 2.0)) / a;
+    double clambda = atan2(y, x);
+    double p = sqrt(pow(x, 2.0) + pow(y, 2.0));
+    double h_old = 0.0;
+
+    // First guess with h=0 meters
+    double theta = atan2(z, p * (1.0 - pow(e, 2.0)));
+    double cs = cos(theta);
+    double sn = sin(theta);
+    double N = pow(a, 2.0) / sqrt(pow(a * cs, 2.0) + pow(b * sn, 2.0));
+    double h = p / cs - N;
+
+    while (fabs(h - h_old) > 1.0e-6) {
+        h_old = h;
+        theta = atan2(z, p * (1.0 - pow(e, 2.0) * N / (N + h)));
+        cs = cos(theta);
+        sn = sin(theta);
+        N = pow(a, 2.0) / sqrt(pow(a * cs, 2.0) + pow(b * sn, 2.0));
+        h = p / cs - N;
+    }
+
+    // Convert radians to degrees
+    *lon = clambda * RAD_TO_DEG;
+    *lat = theta * RAD_TO_DEG;
+    *alt = h;
+}
+
+void uav_trans_ECEF_to_ENU(float x, float y, float z, float lat_r, float lon_r, float x_r, float y_r, float z_r, float *e, float *n, float *u) {
+    double clat = cos(lat_r * DEG_TO_RAD);
+    double slat = sin(lat_r * DEG_TO_RAD);
+    double clon = cos(lon_r * DEG_TO_RAD);
+    double slon = sin(lon_r * DEG_TO_RAD);
+    double dx = x - x_r;
+    double dy = y - y_r;
+    double dz = z - z_r;
+
+    *e = -slon*dx  + clon*dy;
+    *n = -slat*clon*dx - slat*slon*dy + clat*dz;
+    *u = clat*clon*dx + clat*slon*dy + slat*dz;
+}
+
+void uav_trans_ENU_to_ECEF(float e, float n, float u, float lat_r, float lon_r, float x_r, float y_r, float z_r, float *x, float *y, float *z) {
+	 double a = 6378137.0;        
+    double f = 1 / 298.257223563;
+    double b = a * (1 - f);     
+
+    lat_r *= 1 / RAD_TO_DEG;
+    lon_r *= 1 / RAD_TO_DEG;
+
+    double sinRefLat = sin(lat_r);
+    double cosRefLat = cos(lat_r);
+    double sinRefLon = sin(lon_r);
+    double cosRefLon = cos(lon_r);
+
+    double dX = -sinRefLon * e - sinRefLat * cosRefLon * n + cosRefLat * cosRefLon * u;
+    double dY = cosRefLon * e - sinRefLat * sinRefLon * n + cosRefLat * sinRefLon * u;
+    double dZ = cosRefLat * n + sinRefLat * u;
+
+    *x = x_r + dX;
+    *y = y_r + dY;
+    *z = z_r + dZ;
+}

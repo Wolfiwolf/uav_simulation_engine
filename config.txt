@@ -2,4 +2,4 @@ udp_ip_address: 127.0.0.1
 udp_port: 5050
 out_folder: ./logs
 data_link_port: 9000
-
+uav_initial_position: 46.404582 15.634940 270.0

@@ -65,5 +65,15 @@ void uav_orient_q_to_euler(struct Matrix *q, struct Matrix *euler_angles);
 
 void uav_orient_q_dot(struct Matrix *q, struct Matrix *w, struct Matrix *res, float delta_t_sec);
 
+// COORDINATE SYSTEM TRANSFORMATIONS
+
+void uav_trans_geodetic_to_ECEF(float lat, float lon, float alt, float *x, float *y, float *z);
+
+void uav_trans_ECEF_to_geodetic(float x, float y, float z, float *lat, float *lon, float *alt);
+
+void uav_trans_ECEF_to_ENU(float x, float y, float z, float lat_r, float lon_r, float x_r, float y_r, float z_r, float *e, float *n, float *u);
+
+void uav_trans_ENU_to_ECEF(float e, float n, float u, float lat_r, float lon_r, float x_r, float y_r, float z_r, float *x, float *y, float *z);
+
 #endif
 
