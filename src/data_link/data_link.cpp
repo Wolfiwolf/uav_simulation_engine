@@ -1,4 +1,5 @@
 #include "data_link.hpp"
+#include <exception>
 #include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,15 +8,13 @@
 #include <unistd.h>
 #include <iostream>
 
+
 DataLink::DataLink(int port) {
 	_port = port;
 }
 
 DataLink::~DataLink() {
-	// closing the connected socket
 	close(_client_socket);
-	//
-	// closing the listening socket
 	shutdown(_listening_socket, SHUT_RDWR);
 }
 
@@ -37,7 +36,6 @@ void DataLink::wait_for_link() {
 	address.sin_addr.s_addr = INADDR_ANY;
 	address.sin_port = htons(_port);
 
-	// Forcefully attaching socket to the port 8080
 	if (bind(_listening_socket, (struct sockaddr*)&address,
 				sizeof(address))
 			< 0) {
@@ -54,11 +52,10 @@ void DataLink::wait_for_link() {
 	}
 }
 
-void DataLink::send_to_gs() {
-	const char* hello = "Hello from server";
-	send(_client_socket, hello, strlen(hello), 0);
+void DataLink::send_to_gs(uint8_t *data, uint8_t size) {
+	send(_client_socket, data, size, 0);
 }
 
 uint32_t DataLink::listen_for_msg(uint8_t *rx_buffer) {
-	return read(_client_socket, rx_buffer, 1024);
+	return read(_client_socket, rx_buffer, 64);
 }

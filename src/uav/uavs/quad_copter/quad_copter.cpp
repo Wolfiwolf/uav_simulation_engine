@@ -1,4 +1,5 @@
 #include "quad_copter.hpp"
+#include "message_handler/message_handler.hpp"
 #include <cstdlib>
 #include <iostream>
 
@@ -144,10 +145,20 @@ void QuadCopter::moments_update(float delta_t) {
 
 
 void QuadCopter::communication_thread() {
-	_data_link->wait_for_link();
-
-	uint8_t rx_buffer[1024];
+	MessageHandler::init(_data_link);
 	while(true) {
-		_data_link->listen_for_msg(rx_buffer);
+		std::cout << "Waiting for link...\n";
+		_data_link->wait_for_link();
+
+		uint8_t rx_buffer[1024];
+		while(true) {
+			uint32_t data_len = _data_link->listen_for_msg(rx_buffer);
+			 if (data_len == 0) break;
+
+			struct Message msg;
+			MessageHandler::bytes_to_message(rx_buffer, (uint8_t)(data_len & 0xFF), &msg);
+
+			MessageHandler::handle_message(&msg);
+		}
 	}
 }
