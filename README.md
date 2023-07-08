@@ -7,4 +7,13 @@ There are data streams that are implemented so that the engine streams out the s
 ### UDP stream
 This stream outputs the data with the UDP protocol. To receive this data you only have to implement a UDP server and receive the data. The data is in the following format.
 
+|  Data                     | Data type    | Num of bytes  | Description                | 
+| -----------               | ------------ | ------------- | -----------                |
+| Position x                | float        | 4             | The x axis of the position |
+| Position y                | float        | 4             | The y axis of the position |
+| Position z                | float        | 4             | The y axis of the position |
+| Orientation quaternion w  | float        | 4             | The w axis of the orienation quaternion |
+| Orientation quaternion x  | float        | 4             | The x axis of the orienation quaternion |
+| Orientation quaternion y  | float        | 4             | The y axis of the orienation quaternion |
+| Orientation quaternion z  | float        | 4             | The z axis of the orienation quaternion |
 
