@@ -14,6 +14,7 @@ class UAV {
 		struct Matrix _inverse_inertia_matrix;
 
 		struct Matrix _position;
+		struct Matrix _position_geodetic;
 		struct Matrix _velocity;
 		struct Matrix _angular_velocity;
 		struct Matrix _orientation;
@@ -49,6 +50,8 @@ class UAV {
 		float get_mass();
 
 		struct Matrix get_position();
+
+		struct Matrix get_position_geodetic();
 
 		struct Matrix get_velocity();
 

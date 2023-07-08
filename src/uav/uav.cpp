@@ -54,6 +54,9 @@ UAV::UAV() {
 	uav_matrix_init(&_position, 3, 1);
 	for (uint8_t i = 0; i < 3; ++i) _position.rows[i][0] = 0.0f;
 
+	uav_matrix_init(&_position_geodetic, 3, 1);
+	for (uint8_t i = 0; i < 3; ++i) _position_geodetic.rows[i][0] = 0.0f;
+
 	uav_matrix_init(&_velocity, 3, 1);
 	for (uint8_t i = 0; i < 3; ++i) _velocity.rows[i][0] = 0.0f;
 
@@ -102,6 +105,10 @@ float UAV::get_mass() {
 
 struct Matrix UAV::get_position() {
 	return _position;
+}
+
+struct Matrix UAV::get_position_geodetic() {
+	return _position_geodetic;
 }
 
 struct Matrix UAV::get_velocity() {
@@ -182,6 +189,10 @@ void UAV::update_position(float delta_t) {
 			&x, &y, &z);
 
 	uav_trans_ECEF_to_geodetic(x, y, z, &_lat, &_lon, &_alt);
+
+	_position_geodetic.rows[0][0] = _lat;
+	_position_geodetic.rows[1][0] = _lon;
+	_position_geodetic.rows[2][0] = _alt;
 }
 
 void UAV::update_velocity(float delta_t) {
