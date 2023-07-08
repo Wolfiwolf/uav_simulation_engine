@@ -12,6 +12,14 @@ data_link_port: 9000
 uav_initial_position: 46.404582 15.634940 270.0
 ```
 
+|  Parameter            | Description                                                                       |
+| -----------           | ------------                                                                      | 
+|  udp_ip_address       | UDP stream server ip address                                                      |
+|  udp_port             | UDP stream server port                                                            |
+|  out_folder           | File stream folder                                                                |
+|  data_link_port       | The data link TCP/IP port                                                         |
+|  uav_initial_position | The initial geodetic position of the UAV and the ENU coordinate system center     |
+
 
 ## Data out
 There are data streams that are implemented so that the engine streams out the state of the UAV (position, orientation...). The data streaming is also implemented in such a way that is open to add additional ways of streaming the data. In the `src/streamer/streams` there are some 2 examples on how to implement an additional data stream.
