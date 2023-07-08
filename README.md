@@ -1,6 +1,13 @@
 # UAV Simulation engine
 This is a physics engine designed to test UAV control algorithms. It is made in a way so the basic physics are implemented and is open for expansion for the physics that are specific to the type of UAV.
 
+## Usage
+
+```
+make
+./uav_simulation_engine
+```
+
 ## Configuration
 The basic configuration file looks something like this.
 
