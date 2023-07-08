@@ -3,10 +3,12 @@ This is a physics engine designed to test UAV control algorithms. It is made in 
 
 ## Usage
 
+First set values in the configuration file and then use the following commands.
 ```
 make
 ./uav_simulation_engine
 ```
+The engine should be running now.
 
 ## Configuration
 The basic configuration file looks something like this.
