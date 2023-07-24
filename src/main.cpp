@@ -8,6 +8,7 @@
 #include <thread>
 
 void run_data_link(UAV *uav);
+void run_data_link_non_blocking(UAV *uav);
 void run_simulation(UAV *uav);
 
 int main(int argc, char *argv[]) {
@@ -18,9 +19,11 @@ int main(int argc, char *argv[]) {
 
 	std::thread simulation_thread(run_simulation, uav);
 	std::thread data_link_thread(run_data_link, uav);
+	std::thread data_link_non_blocking_thread(run_data_link_non_blocking, uav);
 
 	simulation_thread.join();
 	data_link_thread.join();
+	data_link_non_blocking_thread.join();
 
 	delete uav;
 
@@ -51,4 +54,8 @@ void run_simulation(UAV *uav) {
 
 void run_data_link(UAV *uav) {
 	uav->communication_thread();
+}
+
+void run_data_link_non_blocking(UAV *uav) {
+	uav->communication_non_blocking_thread();
 }

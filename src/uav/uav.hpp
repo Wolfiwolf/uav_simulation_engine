@@ -47,6 +47,8 @@ class UAV {
 
 		virtual void communication_thread() = 0;
 
+		virtual void communication_non_blocking_thread() = 0;
+
 		float get_mass();
 
 		struct Matrix get_position();

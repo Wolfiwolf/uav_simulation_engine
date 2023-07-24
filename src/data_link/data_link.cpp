@@ -50,6 +50,8 @@ void DataLink::wait_for_link() {
 			< 0) {
 		std::cout << "Accepting connection failed!\n";
 	}
+
+	close(_listening_socket);
 }
 
 void DataLink::send_to_gs(uint8_t *data, uint8_t size) {

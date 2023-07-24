@@ -145,7 +145,7 @@ void QuadCopter::moments_update(float delta_t) {
 
 
 void QuadCopter::communication_thread() {
-	MessageHandler::init(_data_link);
+	MessageHandler_init(_data_link);
 	while(true) {
 		std::cout << "Waiting for link...\n";
 		_data_link->wait_for_link();
@@ -156,9 +156,17 @@ void QuadCopter::communication_thread() {
 			 if (data_len == 0) break;
 
 			struct Message msg;
-			MessageHandler::bytes_to_message(rx_buffer, (uint8_t)(data_len & 0xFF), &msg);
+			MessageHandler_bytes_to_message(rx_buffer, &msg);
 
-			MessageHandler::handle_message(&msg);
+			MessageHandler_handle(&msg);
 		}
+	}
+}
+
+void QuadCopter::communication_non_blocking_thread()
+{
+	while(true)
+	{
+		MessageHandler_update();
 	}
 }
