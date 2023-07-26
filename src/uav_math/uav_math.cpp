@@ -326,29 +326,31 @@ void uav_orient_euler_to_q(struct Matrix *euler_angles, struct Matrix *q) {
 	float C12 = cosf(theta) * sinf(psi);
 	float C13 = -sinf(theta);
 
-	float C21 = cosf(psi) * sinf(theta) * sinf(phi) - cosf(theta) * sin(psi);
-	float C22 = cosf(phi) * cosf(psi) + sinf(theta) * sinf(phi) * sinf(psi);
-	float C23 = cosf(theta) * sinf(phi);
+	float C21 = sinf(phi) * sinf(theta) * cosf(psi) - cosf(phi) * sinf(psi);
+	float C22 = cosf(phi) * cosf(psi) + sinf(phi) * sinf(theta) * sinf(psi);
+	float C23 = sinf(phi) * cosf(theta);
 
-	float C31 = cosf(phi) * cosf(psi) * sinf(theta) + sinf(phi) * sinf(psi);
-	float C32 = -cosf(psi) * sinf(phi) + cosf(phi) * sinf(theta) * sinf(psi);
-	float C33 = cosf(theta) * cosf(phi);
+	float C31 = cosf(phi) * sinf(theta) * cosf(psi) + sinf(phi) * sinf(psi);
+	float C32 = cosf(phi) * sinf(theta) * sinf(psi) - sinf(phi) * cosf(psi);
+	float C33 = cosf(phi) * cosf(theta);
 
 	struct Matrix q_h;
 	uav_matrix_init(&q_h, 4, 1);
 
-	q_h.rows[0][0] = sqrtf(0.25f * (1 + C11 + C22 + C33));
-	q_h.rows[1][0] = sqrtf(0.25f * (1 + C11 - C22 - C33));
-	q_h.rows[2][0] = sqrtf(0.25f * (1 - C11 + C22 - C33));
-	q_h.rows[3][0] = sqrtf(0.25f * (1 - C11 - C22 + C33));
+	q_h.rows[0][0] = sqrtf(fabsf(0.25f * (1 + C11 + C22 + C33)));
+	q_h.rows[1][0] = sqrtf(fabsf(0.25f * (1 + C11 - C22 - C33)));
+	q_h.rows[2][0] = sqrtf(fabsf(0.25f * (1 - C11 + C22 - C33)));
+	q_h.rows[3][0] = sqrtf(fabsf(0.25f * (1 - C11 - C22 + C33)));
 
 	float q_h_max = uav_matrix_max(&q_h);
 
+    std::cout << "q_max: " << q_h_max << "\n";
+
 	if (q_h_max == q_h.rows[0][0]) {
 		q->rows[0][0] = q_h_max;
-		q->rows[1][0] = (C23 - C32) / (4 * q_h_max);
-		q->rows[2][0] = (C31 - C13) / (4 * q_h_max);
-		q->rows[3][0] = (C12 - C21) / (4 * q_h_max);
+		q->rows[1][0] = (C23 - C32) / (4.0f * q_h_max); 
+		q->rows[2][0] = (C31 - C13) / (4.0f * q_h_max);
+		q->rows[3][0] = (C12 - C21) / (4.0f * q_h_max);
 	} else if (q_h_max == q_h.rows[1][0]) {
 		q->rows[0][0] = (C23 - C32) / (4 * q_h_max);
 		q->rows[1][0] = q_h_max;
@@ -375,10 +377,10 @@ void uav_orient_q_to_euler(struct Matrix *q, struct Matrix *euler_angles) {
 	float qy = q->rows[2][0];
 	float qz = q->rows[3][0];
 
-	float C23 = 2.0f * (qy * qz + qx * qs);
-	float C33 = qs * qs - qx * qx + qy * qy - qz * qz;
-	float C13 = 2.0f * (qx * qz - qy * qs);
-	float C12 = 2.0f * (qx * qy + qz * qs);
+	float C23 = 2.0f * (qy * qz + qx * qs); // OK
+	float C33 = qs * qs - qx * qx - qy * qy + qz * qz; // OK
+	float C13 = 2.0f * (qx * qz - qy * qs); // OK
+	float C12 = 2.0f * (qx * qy + qz * qs); // OK
 	float C11 = qs * qs + qx * qx - qy * qy - qz * qz;
 
 	if (C13 >= 1.0f) C13 = 1.0f;

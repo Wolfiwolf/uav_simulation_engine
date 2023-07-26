@@ -12,7 +12,7 @@ $(TARGET): $(OBJS)
 
 $(BLD_DIR)/%.cpp.o: %.cpp $(INCS)
 	@mkdir -p $(@D)
-	g++ -c $< -o $@  -lpthread -lm -std=c++11
+	g++ -g -c $< -o $@  -lpthread -lm -std=c++11
 
 clean:
 	rm -rf $(BLD_DIR)

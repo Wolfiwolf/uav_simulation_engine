@@ -64,12 +64,33 @@ UAV::UAV() {
 	for (uint8_t i = 0; i < 3; ++i) _angular_velocity.rows[i][0] = 0.0f;
 
 	uav_matrix_init(&_orientation_euler_angles, 3, 1);
-	_orientation_euler_angles.rows[0][0] = 45.0f;
-	_orientation_euler_angles.rows[1][0] = 45.0f;
-	_orientation_euler_angles.rows[2][0] = 45.0f;
+	_orientation_euler_angles.rows[0][0] = 60.0f * 0.0174532925f;
+	_orientation_euler_angles.rows[1][0] = 10.0f * 0.0174532925f;
+	_orientation_euler_angles.rows[2][0] = 15.0f * 0.0174532925f;
 
 	uav_matrix_init(&_orientation, 4, 1);
 	uav_orient_euler_to_q(&_orientation_euler_angles, &_orientation);
+
+    // TEST
+    std::cout << "##################\n";
+    std::cout << "phi:" << _orientation_euler_angles.rows[0][0] * 57.2957795f << "\n";
+    std::cout << "theta:" << _orientation_euler_angles.rows[1][0] * 57.2957795f << "\n";
+    std::cout << "psi:" << _orientation_euler_angles.rows[2][0] * 57.2957795f << "\n";
+
+    std::cout << "##################\n";
+    std::cout << "w:" << _orientation.rows[0][0] << "\n";
+    std::cout << "x:" << _orientation.rows[1][0] << "\n";
+    std::cout << "y:" << _orientation.rows[2][0] << "\n";
+    std::cout << "z:" << _orientation.rows[3][0] << "\n";
+
+	uav_orient_q_to_euler(&_orientation, &_orientation_euler_angles);
+
+    std::cout << "##################\n";
+    std::cout << "phi:" << _orientation_euler_angles.rows[0][0] * 57.2957795f << "\n";
+    std::cout << "theta:" << _orientation_euler_angles.rows[1][0] * 57.2957795f << "\n";
+    std::cout << "psi:" << _orientation_euler_angles.rows[2][0] * 57.2957795f << "\n";
+
+    // TEST END
 
 	uav_matrix_init(&_forces, 3, 1);
 	for (uint8_t i = 0; i < 3; ++i) _forces.rows[i][0] = 0.0f;
@@ -221,6 +242,7 @@ void UAV::update_orientation(float delta_t) {
 	uav_matrix_scalar_multiply(&_orientation, 1 / mag);
 
 	uav_orient_q_to_euler(&_orientation, &_orientation_euler_angles);
+
 
 	uav_matrix_destroy(&q_dot);
 }

@@ -3,7 +3,7 @@
 #include "config_manager/config_manager.hpp"
 #include "streamer/streamer.hpp"
 #include "uav/uavs/quad_copter/quad_copter.hpp"
-#include <chrono>
+#include <chrono> 
 #include <string>
 #include <thread>
 
@@ -48,7 +48,7 @@ void run_simulation(UAV *uav) {
 
 		uav->update(t, delta_time);
 
-		streamer.stream_data(t, uav);
+        streamer.stream_data(t, uav);
 	}
 }
 
