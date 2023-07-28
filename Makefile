@@ -8,7 +8,7 @@ OBJS=$(SRCS:%=$(BLD_DIR)/%.o)
 TARGET=uav_simulation_engine
 
 $(TARGET): $(OBJS)
-	g++ -o $(TARGET) $(OBJS) 
+	g++ -g -o $(TARGET) $(OBJS) 
 
 $(BLD_DIR)/%.cpp.o: %.cpp $(INCS)
 	@mkdir -p $(@D)

@@ -3,18 +3,13 @@
 #include "../../sensor.hpp"
 #include "../../../uav.hpp"
 
-class GyroData {
-	public: 
-		float p;
-		float q;
-		float r;
-};
 
-class GyroSensor : public Sensor{
+class GyroSensor : public Sensor {
+    private:
+        float _p, _q, _r;
+
 	public:
-		GyroSensor(UAV *uav);
-
-		void init();
+		GyroSensor(UAV *uav, float noise_level);
 
 		void update();
 

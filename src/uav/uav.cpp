@@ -71,27 +71,6 @@ UAV::UAV() {
 	uav_matrix_init(&_orientation, 4, 1);
 	uav_orient_euler_to_q(&_orientation_euler_angles, &_orientation);
 
-    // TEST
-    std::cout << "##################\n";
-    std::cout << "phi:" << _orientation_euler_angles.rows[0][0] * 57.2957795f << "\n";
-    std::cout << "theta:" << _orientation_euler_angles.rows[1][0] * 57.2957795f << "\n";
-    std::cout << "psi:" << _orientation_euler_angles.rows[2][0] * 57.2957795f << "\n";
-
-    std::cout << "##################\n";
-    std::cout << "w:" << _orientation.rows[0][0] << "\n";
-    std::cout << "x:" << _orientation.rows[1][0] << "\n";
-    std::cout << "y:" << _orientation.rows[2][0] << "\n";
-    std::cout << "z:" << _orientation.rows[3][0] << "\n";
-
-	uav_orient_q_to_euler(&_orientation, &_orientation_euler_angles);
-
-    std::cout << "##################\n";
-    std::cout << "phi:" << _orientation_euler_angles.rows[0][0] * 57.2957795f << "\n";
-    std::cout << "theta:" << _orientation_euler_angles.rows[1][0] * 57.2957795f << "\n";
-    std::cout << "psi:" << _orientation_euler_angles.rows[2][0] * 57.2957795f << "\n";
-
-    // TEST END
-
 	uav_matrix_init(&_forces, 3, 1);
 	for (uint8_t i = 0; i < 3; ++i) _forces.rows[i][0] = 0.0f;
 
@@ -113,11 +92,11 @@ UAV::~UAV() {
 }
 
 void UAV::update(uint64_t t, float delta_t) {
-	sensors_update(delta_t);
 	forces_update(delta_t);
 	moments_update(delta_t);
-	physics_update(delta_t);
+	sensors_update(delta_t);
 	control_update(delta_t);
+	physics_update(delta_t);
 }
 
 float UAV::get_mass() {

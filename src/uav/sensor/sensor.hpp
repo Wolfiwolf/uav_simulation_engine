@@ -7,13 +7,10 @@ class UAV;
 class Sensor {
 	protected:
 		UAV *_uav;
+        float _noise_level;
 
 	public:
-		void set_uav(UAV *uav) {
-			_uav = uav;
-		}
-
-		virtual void init() = 0;
+        Sensor(UAV *uav, float noise_level);
 
 		virtual void update() = 0;
 

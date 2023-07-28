@@ -65,6 +65,8 @@ class UAV {
 
 
 	protected:
+		virtual void state_estimation_update(float delta_t) = 0;
+
 		virtual void control_update(float delta_t) = 0;
 
 		virtual void forces_update(float delta_t) = 0;

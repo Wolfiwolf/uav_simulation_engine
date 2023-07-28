@@ -344,8 +344,6 @@ void uav_orient_euler_to_q(struct Matrix *euler_angles, struct Matrix *q) {
 
 	float q_h_max = uav_matrix_max(&q_h);
 
-    std::cout << "q_max: " << q_h_max << "\n";
-
 	if (q_h_max == q_h.rows[0][0]) {
 		q->rows[0][0] = q_h_max;
 		q->rows[1][0] = (C23 - C32) / (4.0f * q_h_max); 

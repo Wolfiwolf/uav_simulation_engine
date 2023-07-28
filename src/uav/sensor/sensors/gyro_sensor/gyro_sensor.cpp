@@ -1,19 +1,17 @@
 #include "gyro_sensor.hpp"
 
-GyroSensor::GyroSensor(UAV *uav) {
-	set_uav(uav);
-}
 
-void GyroSensor::init() {
-
-}
+GyroSensor::GyroSensor(UAV *uav, float noise_level): Sensor(uav, noise_level) {}
 
 void GyroSensor::update() {
+	struct Matrix mat = _uav->get_angular_velocity();
 
+    _p = mat.rows[0][0];
+    _q = mat.rows[1][0];
+    _r = mat.rows[2][0];
 }
 
 std::vector<float> GyroSensor::get_data() {
-	struct Matrix mat = _uav->get_angular_velocity();
 
-	return { mat.rows[0][0], mat.rows[1][0], mat.rows[2][0]};
+	return { _p, _q, _r };
 }

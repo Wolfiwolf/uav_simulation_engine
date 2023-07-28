@@ -18,6 +18,8 @@ class QuadCopter : public UAV {
 		void communication_non_blocking_thread();
 
 	protected:
+		void state_estimation_update(float delta_t);
+
 		void control_update(float delta_t);
 
 		void forces_update(float delta_t);
