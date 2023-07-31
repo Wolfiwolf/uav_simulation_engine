@@ -94,7 +94,7 @@ UAV::~UAV() {
 void UAV::update(uint64_t t, float delta_t) {
 	forces_update(delta_t);
 	moments_update(delta_t);
-	sensors_update(delta_t);
+	sensors_update(t);
 	control_update(delta_t);
 	physics_update(delta_t);
 }
@@ -125,6 +125,14 @@ struct Matrix UAV::get_orientation_q() {
 
 struct Matrix UAV::get_orientation_euler_angles_ZYX() {
 	return _orientation_euler_angles;
+}
+
+struct Matrix UAV::get_forces() {
+    return _forces;
+}
+
+struct Matrix UAV::get_moments() {
+    return _moments;
 }
 
 void UAV::add_force(struct Matrix *force) {
@@ -159,9 +167,9 @@ void UAV::physics_update(float delta_t) {
 	_moments.rows[2][0] = 0.0f;
 }
 
-void UAV::sensors_update(float delta_t) {
+void UAV::sensors_update(uint64_t t) {
 	for (Sensor *sensor : _sensors)
-		sensor->update();
+		sensor->update(t);
 }
 
 void UAV::update_position(float delta_t) {

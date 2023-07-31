@@ -63,6 +63,9 @@ class UAV {
 
 		struct Matrix get_orientation_euler_angles_ZYX();
 
+		struct Matrix get_forces();
+
+		struct Matrix get_moments();
 
 	protected:
 		virtual void state_estimation_update(float delta_t) = 0;
@@ -80,7 +83,7 @@ class UAV {
 	private:
 		void physics_update(float delta_t);
 
-		void sensors_update(float delta_t);
+		void sensors_update(uint64_t t);
 
 		void update_position(float delta_t);
 

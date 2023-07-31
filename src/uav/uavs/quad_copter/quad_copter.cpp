@@ -14,7 +14,10 @@ QuadCopter::QuadCopter() {
 	_actuators["m4"] = 1.0f;
 
 	_gyro_sensor = new GyroSensor(this, 1.0f);
+    _accelerometer_sensor = new AccelerometerSensor(this, 1.0f);
+
 	_sensors.push_back(_gyro_sensor);
+    _sensors.push_back(_accelerometer_sensor);
 }
 
 QuadCopter::~QuadCopter() {
@@ -31,7 +34,6 @@ void QuadCopter::control_update(float delta_t) {
 	static float prev_z = 0.0f;
 
 	static float prev_pow = 0.0f;
-	static float I = 0.0f;
 
 	struct Matrix euler_angles = get_orientation_euler_angles_ZYX();
 	struct Matrix pos = get_position();
