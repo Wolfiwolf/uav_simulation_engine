@@ -11,6 +11,7 @@
 
 DataLink::DataLink(int port) {
 	_port = port;
+    _is_socket_connected = false;
 }
 
 DataLink::~DataLink() {
@@ -19,6 +20,8 @@ DataLink::~DataLink() {
 }
 
 void DataLink::wait_for_link() {
+    _is_socket_connected = false;
+
 	struct sockaddr_in address;
 	int opt = 1;
 	int addrlen = sizeof(address);
@@ -52,10 +55,14 @@ void DataLink::wait_for_link() {
 	}
 
 	close(_listening_socket);
+
+    _is_socket_connected = true;
 }
 
 void DataLink::send_to_gs(uint8_t *data, uint8_t size) {
-	send(_client_socket, data, size, 0);
+    if (_is_socket_connected) {
+	    send(_client_socket, data, size, 0);
+    }
 }
 
 uint32_t DataLink::listen_for_msg(uint8_t *rx_buffer) {

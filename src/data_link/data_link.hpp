@@ -9,6 +9,8 @@ class DataLink {
 		int _listening_socket;
 		int _client_socket;
 
+		bool _is_socket_connected;
+
 	public:
 		DataLink(int port);
 		~DataLink();

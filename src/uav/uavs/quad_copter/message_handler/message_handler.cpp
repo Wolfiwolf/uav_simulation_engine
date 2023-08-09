@@ -33,7 +33,6 @@ struct StreamSession {
 #define MESSAGE_RETRY_TIME_PERIOD 		250
 #define MAX_MESSAGE_RETRIES  			3
 
-static uint32_t msg_calculate_crc(struct Message *msg);
 static uint32_t get_timestamp();
 
 static void send_ack(struct Message *msg);
@@ -103,7 +102,7 @@ void MessageHandler_init(DataLink *data_link)
 
 static void handle_msg(struct Message *msg)
 {
-	uint8_t crc = msg_calculate_crc(msg);
+	uint8_t crc = MessageHandler_calculate_crc(msg);
 
 	if (crc != msg->crc)
 	{
@@ -198,7 +197,7 @@ static void handle_stream(struct Message *msg)
 
 		handle_download(session->channel, session->prev_index, data_msg.data, data_msg.data_len);
 
-		data_msg.crc = msg_calculate_crc(&data_msg);
+		data_msg.crc = MessageHandler_calculate_crc(&data_msg);
 
 		MessageHandler_send_msg(&data_msg);
 
@@ -275,7 +274,7 @@ static void handle_request(struct Message *msg)
 		return;
 	}
 
-	response_msg.crc = msg_calculate_crc(&response_msg);
+	response_msg.crc = MessageHandler_calculate_crc(&response_msg);
 
 	MessageHandler_send_msg(&response_msg);
 
@@ -402,7 +401,7 @@ static void send_nack(struct Message *msg)
 	nack_msg.data_len = 0;
 	nack_msg.timestamp = get_timestamp();
 	nack_msg.msg_type = MESSAGE_TYPE_NACK;
-	nack_msg.crc = msg_calculate_crc(&nack_msg);
+	nack_msg.crc = MessageHandler_calculate_crc(&nack_msg);
 
 	MessageHandler_send_msg(&nack_msg);
 }
@@ -414,7 +413,7 @@ static void send_ack(struct Message *msg)
 	ack_msg.data_len = 0;
 	ack_msg.timestamp = get_timestamp();
 	ack_msg.msg_type = MESSAGE_TYPE_ACK;
-	ack_msg.crc = msg_calculate_crc(&ack_msg);
+	ack_msg.crc = MessageHandler_calculate_crc(&ack_msg);
 
 	MessageHandler_send_msg(&ack_msg);
 }
@@ -441,7 +440,7 @@ static void manage_existing_sessions() {
 				}
 				session->last_msg_t = get_timestamp();
 				session->last_msg.timestamp = session->last_msg_t;
-				session->last_msg.crc = msg_calculate_crc(&session->last_msg);
+				session->last_msg.crc = MessageHandler_calculate_crc(&session->last_msg);
 
 				MessageHandler_send_msg(&session->last_msg);
 
@@ -464,7 +463,7 @@ static void manage_existing_sessions() {
 				{
 					session->last_msg_t = get_timestamp();
 					session->last_msg.timestamp = session->last_msg_t;
-					session->last_msg.crc = msg_calculate_crc(&session->last_msg);
+					session->last_msg.crc = MessageHandler_calculate_crc(&session->last_msg);
 
 					MessageHandler_send_msg(&session->last_msg);
 
@@ -488,7 +487,7 @@ void MessageHandler_send_msg(struct Message *msg)
 	_data_link->send_to_gs(data, len);
 }
 
-static uint32_t msg_calculate_crc(struct Message *msg)
+uint32_t MessageHandler_calculate_crc(struct Message *msg)
 {
 	uint8_t data[32];
 	uint8_t data_len;

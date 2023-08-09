@@ -47,3 +47,5 @@ void MessageHandler_bytes_to_message(uint8_t *data, struct Message *msg);
 void MessageHandler_message_to_bytes(struct Message *msg, uint8_t *buffer, uint8_t *len, bool include_crc);
 
 void MessageHandler_send_msg(struct Message *msg);
+
+uint32_t MessageHandler_calculate_crc(struct Message *msg);

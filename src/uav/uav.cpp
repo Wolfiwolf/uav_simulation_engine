@@ -95,6 +95,7 @@ void UAV::update(uint64_t t, float delta_t) {
 	forces_update(delta_t);
 	moments_update(delta_t);
 	sensors_update(t);
+    state_estimation_update(delta_t);
 	control_update(delta_t);
 	physics_update(delta_t);
 }

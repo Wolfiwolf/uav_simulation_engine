@@ -1,7 +1,9 @@
 #include "quad_copter.hpp"
 #include "message_handler/message_handler.hpp"
 #include <cstdlib>
+#include <cstring>
 #include <iostream>
+#include <chrono>
 
 QuadCopter::QuadCopter() {
 	_power = 0.5f;
@@ -22,10 +24,37 @@ QuadCopter::QuadCopter() {
 
 QuadCopter::~QuadCopter() {
 	delete _gyro_sensor;
+    delete _accelerometer_sensor;
 }
 
 void QuadCopter::state_estimation_update(float delta_t) {
+    static uint32_t prev_send_t = 0;
+	const auto p1 = std::chrono::system_clock::now();
+    uint32_t current_t = std::chrono::duration_cast<std::chrono::milliseconds>(p1.time_since_epoch()).count();
 
+    if (current_t - prev_send_t > 250) {
+        struct Message msg;
+
+        msg.timestamp = current_t;
+        msg.session_id = (rand() % 0xFFFFFFFF) & 0xFFFFFFFF;
+        msg.session_type = SESSION_TYPE_UNSOLICITED;
+        msg.channel = UNSOLICITED_UAV_ORIENTATION;
+        msg.msg_index = 0;
+        msg.msg_type = MESSAGE_TYPE_DATA;
+        msg.data_len = 3 * 4;
+
+        struct Matrix euler_angles = get_orientation_euler_angles_ZYX();
+
+        memcpy(msg.data, &euler_angles.rows[0][0], 4);
+        memcpy(msg.data + 4, &euler_angles.rows[1][0], 4);
+        memcpy(msg.data + 8, &euler_angles.rows[1][0], 4);
+
+        msg.crc = MessageHandler_calculate_crc(&msg);
+
+        MessageHandler_send_msg(&msg);
+
+        prev_send_t = current_t;
+    }
 }
 
 void QuadCopter::control_update(float delta_t) {
@@ -155,6 +184,7 @@ void QuadCopter::communication_thread() {
 	while(true) {
 		std::cout << "Waiting for link...\n";
 		_data_link->wait_for_link();
+		std::cout << "Link established!\n";
 
 		uint8_t rx_buffer[1024];
 		while(true) {
