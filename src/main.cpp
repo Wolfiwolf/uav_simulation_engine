@@ -3,6 +3,7 @@
 #include "config_manager/config_manager.hpp"
 #include "streamer/streamer.hpp"
 #include "uav/uavs/quad_copter/quad_copter.hpp"
+#include "uav_math/uav_math.hpp"
 #include <chrono> 
 #include <string>
 #include <thread>
@@ -49,6 +50,13 @@ void run_simulation(UAV *uav) {
 		uav->update(t, delta_time);
 
         streamer.stream_data(t, uav);
+
+        struct Matrix pos = uav->get_position();
+        struct Matrix euler = uav->get_orientation_euler_angles_ZYX();
+        std::cout  << "Euler:\n";
+        std::cout << euler.rows[0][0] << ", " << euler.rows[1][0] << ", " << euler.rows[2][0] << "\n";
+        std::cout  << "Pos:\n";
+        std::cout << pos.rows[0][0] << ", " << pos.rows[1][0] << ", " << pos.rows[2][0] << "\n";
 	}
 }
 

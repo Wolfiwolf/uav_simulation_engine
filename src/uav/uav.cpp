@@ -64,9 +64,9 @@ UAV::UAV() {
 	for (uint8_t i = 0; i < 3; ++i) _angular_velocity.rows[i][0] = 0.0f;
 
 	uav_matrix_init(&_orientation_euler_angles, 3, 1);
-	_orientation_euler_angles.rows[0][0] = 60.0f * 0.0174532925f;
-	_orientation_euler_angles.rows[1][0] = 10.0f * 0.0174532925f;
-	_orientation_euler_angles.rows[2][0] = 15.0f * 0.0174532925f;
+	_orientation_euler_angles.rows[0][0] = 0.0f * 0.0174532925f;
+	_orientation_euler_angles.rows[1][0] = 0.0f * 0.0174532925f;
+	_orientation_euler_angles.rows[2][0] = 0.0f * 0.0174532925f;
 
 	uav_matrix_init(&_orientation, 4, 1);
 	uav_orient_euler_to_q(&_orientation_euler_angles, &_orientation);
@@ -145,10 +145,10 @@ void UAV::add_moment(struct Matrix *moment) {
 }
 
 void UAV::physics_update(float delta_t) {
-
 	uav_rotation_body_to_inertial(&_forces, &_orientation_euler_angles);
 
-	_forces.rows[2][0] = _forces.rows[2][0] - 9.8f * _mass;
+	_forces.rows[2][0] = _forces.rows[2][0] + 9.8f * _mass;
+    std::cout << "Force: (" << _forces.rows[0][0] << ", " << _forces.rows[1][0] << ", " << _forces.rows[2][0] << ")\n";
 
 	update_velocity(delta_t);
 
@@ -209,6 +209,8 @@ void UAV::update_velocity(float delta_t) {
 	uav_matrix_init(&velocity_dot, 3, 1);
 
 	uav_matrix_copy(&_forces, &velocity_dot);
+
+    velocity_dot.rows[2][0] = -velocity_dot.rows[2][0];
 
 	uav_matrix_scalar_multiply(&velocity_dot, delta_t / _mass);
 

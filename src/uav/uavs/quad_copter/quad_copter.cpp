@@ -140,9 +140,10 @@ void QuadCopter::forces_update(float delta_t) {
 
     force.rows[0][0] = 0.0f;
     force.rows[1][0] = 0.0f;
-    force.rows[2][0] = 0.7f * (get_mass() * 9.8f) * (_actuators["m1"] + _actuators["m2"] + _actuators["m3"] + _actuators["m4"]);
+    force.rows[2][0] = -0.7f * (get_mass() * 9.8f) * (_actuators["m1"] + _actuators["m2"] + _actuators["m3"] + _actuators["m4"]);
 
     add_force(&force);
+
 
     uav_matrix_destroy(&force);
 }
