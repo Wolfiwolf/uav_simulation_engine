@@ -95,7 +95,9 @@ void QuadCopter::control_update(float delta_t) {
     struct Matrix euler_angles = get_orientation_euler_angles_ZYX();
     struct Matrix pos = get_position();
 
-    float Px = 0.5f * -euler_angles.rows[0][0];
+    float target_x = 0.3f;
+
+    float Px = 0.5f * (target_x-euler_angles.rows[0][0]);
     float Dx = 1000.0f * (prev_x - euler_angles.rows[0][0]);
     prev_x = euler_angles.rows[0][0];
 
