@@ -53,10 +53,6 @@ void run_simulation(UAV *uav) {
 
         struct Matrix pos = uav->get_position();
         struct Matrix euler = uav->get_orientation_euler_angles_ZYX();
-        std::cout  << "Euler:\n";
-        std::cout << euler.rows[0][0] << ", " << euler.rows[1][0] << ", " << euler.rows[2][0] << "\n";
-        std::cout  << "Pos:\n";
-        std::cout << pos.rows[0][0] << ", " << pos.rows[1][0] << ", " << pos.rows[2][0] << "\n";
 	}
 }
 

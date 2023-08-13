@@ -148,7 +148,6 @@ void UAV::physics_update(float delta_t) {
 	uav_rotation_body_to_inertial(&_forces, &_orientation_euler_angles);
 
 	_forces.rows[2][0] = _forces.rows[2][0] + 9.8f * _mass;
-    std::cout << "Force: (" << _forces.rows[0][0] << ", " << _forces.rows[1][0] << ", " << _forces.rows[2][0] << ")\n";
 
 	update_velocity(delta_t);
 
