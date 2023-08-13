@@ -29,11 +29,13 @@ QuadCopter::~QuadCopter() {
 
 void QuadCopter::state_estimation_update(float delta_t) {
     static uint32_t prev_send_t = 0;
+    static bool toggle = false;
+
 	const auto p1 = std::chrono::system_clock::now();
     uint32_t current_t = std::chrono::duration_cast<std::chrono::milliseconds>(p1.time_since_epoch()).count();
 
-    if (current_t - prev_send_t > 250) {
-        {
+    if (current_t - prev_send_t > 125) {
+        if (toggle) {
             struct Message msg;
 
             msg.timestamp = current_t;
@@ -53,9 +55,9 @@ void QuadCopter::state_estimation_update(float delta_t) {
             msg.crc = MessageHandler_calculate_crc(&msg);
 
             MessageHandler_send_msg(&msg);
-        }
 
-        {
+            toggle = !toggle;
+        } else {
             struct Message msg;
 
             msg.timestamp = current_t;
@@ -75,6 +77,8 @@ void QuadCopter::state_estimation_update(float delta_t) {
             msg.crc = MessageHandler_calculate_crc(&msg);
 
             MessageHandler_send_msg(&msg);
+
+            toggle = !toggle;
         }
 
         prev_send_t = current_t;
