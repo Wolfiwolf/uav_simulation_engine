@@ -57,12 +57,15 @@ static void handle_upload(uint8_t channel, uint32_t address, uint8_t *buffer, ui
 static void handle_request_marco(uint8_t *buffer, uint8_t *data_len);
 
 static void handle_command_calibrate(uint8_t *buffer, uint8_t data_len);
+static void handle_command_control_pan(uint8_t *buffer, uint8_t data_len);
+static void handle_command_control_elevation(uint8_t *buffer, uint8_t data_len);
 
 static void handle_download_test(uint32_t address, uint8_t *buffer, uint8_t data_len);
 
 static void handle_upload_test(uint32_t address, uint8_t *buffer, uint8_t data_len);
 
 static DataLink *_data_link;
+static QuadCopter *_quad_copter;
 
 #define NUM_OF_SESSIONS 6
 
@@ -88,9 +91,10 @@ void MessageHandler_update()
 	}
 }
 
-void MessageHandler_init(DataLink *data_link)
+void MessageHandler_init(DataLink *data_link, QuadCopter *quad_copter)
 {
 	_data_link = data_link;
+    _quad_copter = quad_copter;
 
 	for (uint8_t i = 0; i < NUM_OF_SESSIONS; i++) {
 		_single_sessions[i].active = false;
@@ -229,8 +233,11 @@ static void handle_command(struct Message *msg)
 {
 	switch (msg->channel)
 	{
-	case COMMAND_CALIBRATE:
-		handle_command_calibrate(msg->data, msg->data_len);
+	case COMMAND_CONTROL_PAN:
+		handle_command_control_pan(msg->data, msg->data_len);
+		break;
+	case COMMAND_CONTROL_ELEVATION:
+		handle_command_control_elevation(msg->data, msg->data_len);
 		break;
 	default:
 	 	send_nack(msg);
@@ -320,6 +327,14 @@ static void handle_upload(uint8_t channel, uint32_t address, uint8_t *buffer, ui
 
 static void handle_command_calibrate(uint8_t *buffer, uint8_t data_len)
 {
+}
+
+static void handle_command_control_pan(uint8_t *buffer, uint8_t data_len) {
+    _quad_copter->control_pan(*(float *)buffer, *(float *)(buffer + 4));
+}
+
+static void handle_command_control_elevation(uint8_t *buffer, uint8_t data_len) {
+    _quad_copter->control_elevation(*(float *)buffer);
 }
 
 static void handle_request_marco(uint8_t *buffer, uint8_t *data_len)

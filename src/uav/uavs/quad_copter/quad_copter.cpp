@@ -4,11 +4,17 @@
 #include <cstring>
 #include <iostream>
 #include <chrono>
+#include <cmath>
+#include "../../../uav_math/uav_math.hpp"
 
 QuadCopter::QuadCopter() {
 	_power = 0.5f;
 
 	_target_altitude = 10.0f;
+    uav_matrix_init(&_target_orientation, 3, 1);
+    for (uint8_t i = 0; i < 3; ++i) 
+        _target_orientation.rows[i][0] = 0.0f;
+    
 
 	_actuators["m1"] = 1.0f;
 	_actuators["m2"] = 1.0f;
@@ -95,13 +101,14 @@ void QuadCopter::control_update(float delta_t) {
     struct Matrix euler_angles = get_orientation_euler_angles_ZYX();
     struct Matrix pos = get_position();
 
-    float target_x = 0.3f;
+    float target_x = _target_orientation.rows[0][0];
+    float target_y = _target_orientation.rows[1][0];
 
-    float Px = 0.5f * (target_x-euler_angles.rows[0][0]);
+    float Px = 0.5f * (target_x - euler_angles.rows[0][0]);
     float Dx = 1000.0f * (prev_x - euler_angles.rows[0][0]);
     prev_x = euler_angles.rows[0][0];
 
-    float Py = 0.5f * -euler_angles.rows[1][0];
+    float Py = 0.5f * (target_y - euler_angles.rows[1][0]);
     float Dy = 1000.0f * (prev_y - euler_angles.rows[1][0]);
     prev_y = euler_angles.rows[1][0];
 
@@ -211,7 +218,7 @@ void QuadCopter::moments_update(float delta_t) {
 
 
 void QuadCopter::communication_thread() {
-    MessageHandler_init(_data_link);
+    MessageHandler_init(_data_link, this);
     while(true) {
         std::cout << "Waiting for link...\n";
         _data_link->wait_for_link();
@@ -236,4 +243,12 @@ void QuadCopter::communication_non_blocking_thread()
     {
         MessageHandler_update();
     }
+}
+
+void QuadCopter::control_pan(float alpha, float val) {
+    _target_orientation.rows[0][0] = sinf(alpha) * 30.0f * val;
+    _target_orientation.rows[1][0] = cosf(alpha) * 30.0f * val;
+}
+
+void QuadCopter::control_elevation(float val) {
 }

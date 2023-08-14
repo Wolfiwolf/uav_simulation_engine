@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../../../data_link/data_link.hpp"
+#include "../quad_copter.hpp"
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -10,15 +11,22 @@
 #define SESSION_TYPE_DOWNLOAD 		3
 #define SESSION_TYPE_UPLOAD 		4
 
-#define REQUEST_MARCO 						0
+#define REQUEST_MARCO 			0
+#define REQUEST_GET_TIMESTAMP 	1
+#define REQUEST_GET_ALIVE_TIME 	2
 
-#define COMMAND_CALIBRATE 					0
+#define COMMAND_CALIBRATE_GYRO 		            0
+#define COMMAND_CALIBRATE_ACCELEROMETER_XY 		1
+#define COMMAND_CALIBRATE_ACCELEROMETER_Z 		2
+#define COMMAND_SET_TIMESTAMP 		            3
+#define COMMAND_CONTROL_PAN 		            4
+#define COMMAND_CONTROL_ELEVATION 		        5
 
 #define DOWNLOAD_TEST 			0
 
 #define UPLOAD_TEST 			0
 
-#define UNSOLICITED_UAV_POSITION    0
+#define UNSOLICITED_UAV_POSITION 0
 #define UNSOLICITED_UAV_ORIENTATION 1
 
 #define MESSAGE_TYPE_DATA 	0
@@ -37,7 +45,8 @@ struct Message {
 	uint8_t data[16];
 };
 
-void MessageHandler_init(DataLink *data_link);
+
+void MessageHandler_init(DataLink *data_link, QuadCopter *quad_copter);
 
 void MessageHandler_handle(struct Message *msg);
 
