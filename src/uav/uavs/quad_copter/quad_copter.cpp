@@ -245,9 +245,9 @@ void QuadCopter::communication_non_blocking_thread()
     }
 }
 
-void QuadCopter::control_pan(float alpha, float val) {
-    _target_orientation.rows[0][0] = sinf(alpha) * 30.0f * val;
-    _target_orientation.rows[1][0] = cosf(alpha) * 30.0f * val;
+void QuadCopter::control_pan(float x, float y) {
+    _target_orientation.rows[0][0] = 30.0f * y * 0.01745329f;
+    _target_orientation.rows[1][0] = 30.0f * -x * 0.01745329f;
 }
 
 void QuadCopter::control_elevation(float val) {
