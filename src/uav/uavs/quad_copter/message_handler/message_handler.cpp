@@ -56,7 +56,9 @@ static void handle_upload(uint8_t channel, uint32_t address, uint8_t *buffer, ui
 
 static void handle_request_marco(uint8_t *buffer, uint8_t *data_len);
 
-static void handle_command_calibrate(uint8_t *buffer, uint8_t data_len);
+static void handle_command_calibrate_gyro(uint8_t *buffer, uint8_t data_len);
+static void handle_command_calibrate_accelerometer_xy(uint8_t *buffer, uint8_t data_len);
+static void handle_command_calibrate_accelerometer_z(uint8_t *buffer, uint8_t data_len);
 static void handle_command_control_pan(uint8_t *buffer, uint8_t data_len);
 static void handle_command_control_elevation(uint8_t *buffer, uint8_t data_len);
 
@@ -233,6 +235,15 @@ static void handle_command(struct Message *msg)
 {
 	switch (msg->channel)
 	{
+	case COMMAND_CALIBRATE_GYRO:
+		handle_command_calibrate_gyro(msg->data, msg->data_len);
+		break;
+	case COMMAND_CALIBRATE_ACCELEROMETER_XY:
+		handle_command_calibrate_accelerometer_xy(msg->data, msg->data_len);
+		break;
+	case COMMAND_CALIBRATE_ACCELEROMETER_Z:
+		handle_command_calibrate_accelerometer_z(msg->data, msg->data_len);
+		break;
 	case COMMAND_CONTROL_PAN:
 		handle_command_control_pan(msg->data, msg->data_len);
 		break;
@@ -325,8 +336,15 @@ static void handle_upload(uint8_t channel, uint32_t address, uint8_t *buffer, ui
 	}
 }
 
-static void handle_command_calibrate(uint8_t *buffer, uint8_t data_len)
-{
+static void handle_command_calibrate_gyro(uint8_t *buffer, uint8_t data_len) {
+}
+
+static void handle_command_calibrate_accelerometer_xy(uint8_t *buffer, uint8_t data_len) {
+
+}
+
+static void handle_command_calibrate_accelerometer_z(uint8_t *buffer, uint8_t data_len) {
+
 }
 
 static void handle_command_control_pan(uint8_t *buffer, uint8_t data_len) {
