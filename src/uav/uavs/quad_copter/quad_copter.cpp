@@ -35,12 +35,12 @@ QuadCopter::~QuadCopter() {
 
 void QuadCopter::state_estimation_update(float delta_t) {
 	const auto p1 = std::chrono::system_clock::now();
-    static uint32_t prev_send_t = std::chrono::duration_cast<std::chrono::milliseconds>(p1.time_since_epoch()).count() - 126;
+    static uint32_t prev_send_t = std::chrono::duration_cast<std::chrono::milliseconds>(p1.time_since_epoch()).count() - 26;
     static bool toggle = false;
 
     uint32_t current_t = std::chrono::duration_cast<std::chrono::milliseconds>(p1.time_since_epoch()).count();
 
-    if (current_t - prev_send_t > 125) {
+    if (current_t - prev_send_t > 25) {
         if (toggle) {
             struct Message msg;
 
