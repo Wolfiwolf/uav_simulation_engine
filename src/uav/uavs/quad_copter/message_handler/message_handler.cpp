@@ -233,29 +233,51 @@ static void handle_stream(struct Message *msg)
 
 static void handle_command(struct Message *msg)
 {
-	switch (msg->channel)
-	{
-	case COMMAND_CALIBRATE_GYRO:
-		handle_command_calibrate_gyro(msg->data, msg->data_len);
-		break;
-	case COMMAND_CALIBRATE_ACCELEROMETER_XY:
-		handle_command_calibrate_accelerometer_xy(msg->data, msg->data_len);
-		break;
-	case COMMAND_CALIBRATE_ACCELEROMETER_Z:
-		handle_command_calibrate_accelerometer_z(msg->data, msg->data_len);
-		break;
-	case COMMAND_CONTROL_PAN:
-		handle_command_control_pan(msg->data, msg->data_len);
-		break;
-	case COMMAND_CONTROL_ELEVATION:
-		handle_command_control_elevation(msg->data, msg->data_len);
-		break;
-	default:
-	 	send_nack(msg);
-		break;
+    bool res = false;
+    switch (msg->channel)
+    {
+        case COMMAND_GYRO_TOGGLE_CALIBRATION:
+            break;
+        case COMMAND_GYRO_SET_OFFSETS:
+            break;
+        case COMMAND_ACCELEROMETER_TOGGLE_CALIBRATION:
+            break;
+        case COMMAND_ACCELEROMETER_SET_OFFSETS:
+            break;
+        case COMMAND_ACCELEROMETER_SET_SCALERS:
+            break;
+        case COMMAND_MAGNETOMETER_TOGGLE_CALIBRATION:
+            break;
+        case COMMAND_MAGNETOMETER_SET_HARD_IRON_BIAS:
+            break;
+        case COMMAND_MAGNETOMETER_SET_X_SOFT_IRON_BIAS:
+            break;
+        case COMMAND_MAGNETOMETER_SET_Y_SOFT_IRON_BIAS:
+            break;
+        case COMMAND_MAGNETOMETER_SET_Z_SOFT_IRON_BIAS:
+            break;
+        case COMMAND_SET_STREAMING_POSITION:
+            break;
+        case COMMAND_SET_STREAMING_ORIENTATION:
+            break;
+        case COMMAND_SET_STREAMING_GYRO:
+            break;
+        case COMMAND_SET_STREAMING_ACCELEROMETER:
+            break;
+        case COMMAND_SET_STREAMING_MAGNETOMETER:
+            break;
+        case COMMAND_SET_STREAMING_BAROMETER:
+            break;
+        case COMMAND_CONTROL_PAN:
+            handle_command_control_pan(msg->data, msg->data_len);
+            break;
+        case COMMAND_CONTROL_ELEVATION:
+            handle_command_control_elevation(msg->data, msg->data_len);
+            break;
 	}
 
-	send_ack(msg);
+    if (res) send_ack(msg);
+    else send_nack(msg);
 }
 
 static void handle_request(struct Message *msg)
@@ -282,34 +304,43 @@ static void handle_request(struct Message *msg)
 	response_msg.msg_type = MESSAGE_TYPE_DATA;
 	response_msg.msg_index = msg->msg_index + 1;
 
+    bool res = false;
 	switch (msg->channel)
 	{
 	case REQUEST_MARCO:
 	 	handle_request_marco(response_msg.data, &response_msg.data_len);
+        res = true;
 		break;
-	default:
-	 	send_nack(msg);
-		return;
+	case REQUEST_GET_TIMESTAMP:
+        res = true;
+		break;
+	case REQUEST_GET_ALIVE_TIME:
+        res = true;
+		break;
 	}
 
-	response_msg.crc = MessageHandler_calculate_crc(&response_msg);
+    if (!res) {
+        send_nack(msg);
+    } else {
+        response_msg.crc = MessageHandler_calculate_crc(&response_msg);
 
-	MessageHandler_send_msg(&response_msg);
+        MessageHandler_send_msg(&response_msg);
 
-	session_index = get_free_session_index(msg->session_type);
-	if (session_index == 0xFF) {
-		send_nack(msg);
-		return;
-	}
+        session_index = get_free_session_index(msg->session_type);
+        if (session_index == 0xFF) {
+            send_nack(msg);
+            return;
+        }
 
-	struct SingleSession *session = &_single_sessions[session_index];
-	session->active = true;
-	session->last_msg_t = get_timestamp();
-	session->session_id = msg->session_id;
-	session->session_type = SESSION_TYPE_REQUEST;
-	session->channel = msg->channel;
-	session->retry_count = 0;
-	session->last_msg = response_msg;
+        struct SingleSession *session = &_single_sessions[session_index];
+        session->active = true;
+        session->last_msg_t = get_timestamp();
+        session->session_id = msg->session_id;
+        session->session_type = SESSION_TYPE_REQUEST;
+        session->channel = msg->channel;
+        session->retry_count = 0;
+        session->last_msg = response_msg;
+    }
 }
 
 static void handle_download(uint8_t channel, uint32_t address, uint8_t *buffer, uint8_t data_len)

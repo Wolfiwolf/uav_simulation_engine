@@ -47,7 +47,7 @@ void QuadCopter::state_estimation_update(float delta_t) {
             msg.timestamp = current_t;
             msg.session_id = (rand() % 0xFFFFFFFF) & 0xFFFFFFFF;
             msg.session_type = SESSION_TYPE_UNSOLICITED;
-            msg.channel = UNSOLICITED_UAV_ORIENTATION;
+            msg.channel = UNSOLICITED_ORIENTATION;
             msg.msg_index = 0;
             msg.msg_type = MESSAGE_TYPE_DATA;
             msg.data_len = 3 * 4;
@@ -69,7 +69,7 @@ void QuadCopter::state_estimation_update(float delta_t) {
             msg.timestamp = current_t;
             msg.session_id = (rand() % 0xFFFFFFFF) & 0xFFFFFFFF;
             msg.session_type = SESSION_TYPE_UNSOLICITED;
-            msg.channel = UNSOLICITED_UAV_POSITION;
+            msg.channel = UNSOLICITED_POSITION;
             msg.msg_index = 0;
             msg.msg_type = MESSAGE_TYPE_DATA;
             msg.data_len = 3 * 4;
