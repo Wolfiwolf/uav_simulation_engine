@@ -237,42 +237,60 @@ static void handle_command(struct Message *msg)
     switch (msg->channel)
     {
         case COMMAND_GYRO_TOGGLE_CALIBRATION:
+            res = true;
             break;
         case COMMAND_GYRO_SET_OFFSETS:
+            res = true;
             break;
         case COMMAND_ACCELEROMETER_TOGGLE_CALIBRATION:
+            res = true;
             break;
         case COMMAND_ACCELEROMETER_SET_OFFSETS:
+            res = true;
             break;
         case COMMAND_ACCELEROMETER_SET_SCALERS:
+            res = true;
             break;
         case COMMAND_MAGNETOMETER_TOGGLE_CALIBRATION:
+            res = true;
             break;
         case COMMAND_MAGNETOMETER_SET_HARD_IRON_BIAS:
+            res = true;
             break;
         case COMMAND_MAGNETOMETER_SET_X_SOFT_IRON_BIAS:
+            res = true;
             break;
         case COMMAND_MAGNETOMETER_SET_Y_SOFT_IRON_BIAS:
+            res = true;
             break;
         case COMMAND_MAGNETOMETER_SET_Z_SOFT_IRON_BIAS:
+            res = true;
             break;
         case COMMAND_SET_STREAMING_POSITION:
+            res = true;
             break;
         case COMMAND_SET_STREAMING_ORIENTATION:
+            res = true;
             break;
         case COMMAND_SET_STREAMING_GYRO:
+            res = true;
             break;
         case COMMAND_SET_STREAMING_ACCELEROMETER:
+            res = true;
             break;
         case COMMAND_SET_STREAMING_MAGNETOMETER:
+            res = true;
             break;
         case COMMAND_SET_STREAMING_BAROMETER:
+            res = true;
             break;
         case COMMAND_CONTROL_PAN:
             handle_command_control_pan(msg->data, msg->data_len);
+            res = true;
             break;
         case COMMAND_CONTROL_ELEVATION:
             handle_command_control_elevation(msg->data, msg->data_len);
+            res = true;
             break;
 	}
 
