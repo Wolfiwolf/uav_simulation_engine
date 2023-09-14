@@ -50,9 +50,6 @@ void run_simulation(UAV *uav) {
 		uav->update(t, delta_time);
 
         streamer.stream_data(t, uav);
-
-        struct Matrix pos = uav->get_position();
-        struct Matrix euler = uav->get_orientation_euler_angles_ZYX();
 	}
 }
 

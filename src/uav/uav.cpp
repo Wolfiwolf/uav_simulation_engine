@@ -191,7 +191,7 @@ void UAV::update_position(float delta_t) {
 	uav_trans_geodetic_to_ECEF(_start_lat, _start_lon, _start_alt, &x_r, &y_r, &z_r);
 
 	uav_trans_ENU_to_ECEF(
-			_position.rows[0][0], _position.rows[1][0], _position.rows[2][0], 
+			_position.rows[1][0], _position.rows[0][0], _position.rows[2][0], 
 			_start_lat, _start_lon, 
 			x_r, y_r, z_r, 
 			&x, &y, &z);
