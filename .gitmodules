@@ -1,0 +1,3 @@
+[submodule "src/submodules/uav_angular_velocity_control"]
+	path = src/submodules/uav_angular_velocity_control
+	url = https://gitlab.com/uav5505023/submodules/cc/uav_angular_velocity_control.git

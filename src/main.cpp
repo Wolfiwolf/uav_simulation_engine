@@ -50,6 +50,10 @@ void run_simulation(UAV *uav) {
 		uav->update(t, delta_time);
 
         streamer.stream_data(t, uav);
+
+        struct Matrix w = uav->get_angular_velocity();
+
+        std::cout << w.rows[0][0] << "\n";
 	}
 }
 

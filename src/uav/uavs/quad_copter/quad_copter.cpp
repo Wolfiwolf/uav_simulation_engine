@@ -6,6 +6,7 @@
 #include <chrono>
 #include <cmath>
 #include "../../../uav_math/uav_math.hpp"
+#include "../../../submodules/uav_angular_velocity_control/uav_angular_velocity_control.h"
 
 QuadCopter::QuadCopter() {
 	_power = 0.5f;
@@ -26,6 +27,9 @@ QuadCopter::QuadCopter() {
 
 	_sensors.push_back(_gyro_sensor);
     _sensors.push_back(_accelerometer_sensor);
+
+    UAVAngularVelocityControl_init();
+    UAVAngularVelocityControl_set_target(0.17, 0, 0);
 }
 
 QuadCopter::~QuadCopter() {
@@ -99,52 +103,17 @@ void QuadCopter::control_update(float delta_t) {
     static float prev_pow = 0.0f;
 
     struct Matrix euler_angles = get_orientation_euler_angles_ZYX();
+    struct Matrix w = get_angular_velocity();
     struct Matrix pos = get_position();
 
-    float target_x = _target_orientation.rows[0][0];
-    float target_y = _target_orientation.rows[1][0];
+    float m1, m2, m3, m4;
+    UAVAngularVelocityControl_update(delta_t, w.rows[0][0], w.rows[1][0], w.rows[2][0]);
+    UAVAngularVelocityControl_get_motor_vals(&m1, &m2, &m3, &m4);
 
-    float Px = 0.5f * (target_x - euler_angles.rows[0][0]);
-    float Dx = 1000.0f * (prev_x - euler_angles.rows[0][0]);
-    prev_x = euler_angles.rows[0][0];
-
-    float Py = 0.5f * (target_y - euler_angles.rows[1][0]);
-    float Dy = 1000.0f * (prev_y - euler_angles.rows[1][0]);
-    prev_y = euler_angles.rows[1][0];
-
-    float Pz = 0.4f * -euler_angles.rows[2][0];
-    float Dz = 8000.0f * (prev_z - euler_angles.rows[2][0]);
-    prev_z = euler_angles.rows[2][0];
-
-    float Ppower = 4.0f * (_target_altitude - pos.rows[2][0]);
-    float Dpower = 200000.0f * (prev_pow - pos.rows[2][0]);
-    prev_pow = pos.rows[2][0];
-
-    float power_gain = Ppower + Dpower;
-    if (power_gain > 0.4) power_gain = 0.4f;
-    else if (power_gain < -0.4) power_gain = -0.4f;
-
-    float m1 = _power + power_gain + (Px + Dx) + (Py + Dy) + (Pz + Dz);
-    float m2 = _power + power_gain - (Px + Dx) + (Py + Dy) - (Pz + Dz);
-    float m3 = _power + power_gain - (Px + Dx) - (Py + Dy) + (Pz + Dz);
-    float m4 = _power + power_gain + (Px + Dx) - (Py + Dy) - (Pz + Dz);
-
-    if (m1 < 0.0f) m1 = 0.0f;
-    if (m1 > 1.0f) m1 = 1.0f;
-
-    if (m2 < 0.0f) m2 = 0.0f;
-    if (m2 > 1.0f) m2 = 1.0f;
-
-    if (m3 < 0.0f) m3 = 0.0f;
-    if (m3 > 1.0f) m3 = 1.0f;
-
-    if (m4 < 0.0f) m4 = 0.0f;
-    if (m4 > 1.0f) m4 = 1.0f;
-
-    _actuators["m1"] = m1;
-    _actuators["m2"] = m2;
-    _actuators["m3"] = m3;
-    _actuators["m4"] = m4;
+    _actuators["m1"] = m1 + _power;
+    _actuators["m2"] = m2 + _power;
+    _actuators["m3"] = m3 + _power;
+    _actuators["m4"] = m4 + _power;
 }
 
 void QuadCopter::forces_update(float delta_t) {
