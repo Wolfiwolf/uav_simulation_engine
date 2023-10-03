@@ -6,7 +6,7 @@
 #include <chrono>
 #include <cmath>
 #include "../../../uav_math/uav_math.hpp"
-#include "../../../submodules/uav_angular_velocity_control/uav_angular_velocity_control.h"
+#include "../../../submodules/uav_orientation_control/uav_orientation_control.h"
 
 QuadCopter::QuadCopter() {
 	_power = 0.5f;
@@ -28,8 +28,8 @@ QuadCopter::QuadCopter() {
 	_sensors.push_back(_gyro_sensor);
     _sensors.push_back(_accelerometer_sensor);
 
-    UAVAngularVelocityControl_init();
-    UAVAngularVelocityControl_set_target(0, 0, 0);
+    UAVOrientationControl_init();
+    UAVOrientationControl_set_target(0.707f, 0, 0);
 }
 
 QuadCopter::~QuadCopter() {
@@ -96,24 +96,25 @@ void QuadCopter::state_estimation_update(float delta_t) {
 }
 
 void QuadCopter::control_update(float delta_t) {
-    static float prev_x = 0.0f;
-    static float prev_y = 0.0f;
-    static float prev_z = 0.0f;
+    volatile static float t_sum = 0;
+    t_sum += delta_t;
 
-    static float prev_pow = 0.0f;
+    if (t_sum > 0.01) {
+        struct Matrix euler_angles = get_orientation_euler_angles_ZYX();
+        struct Matrix w = get_angular_velocity();
+        struct Matrix pos = get_position();
 
-    struct Matrix euler_angles = get_orientation_euler_angles_ZYX();
-    struct Matrix w = get_angular_velocity();
-    struct Matrix pos = get_position();
+        float m1, m2, m3, m4;
+        UAVOrientationControl_update(t_sum, euler_angles.rows[0][0], euler_angles.rows[1][0], euler_angles.rows[2][0], w.rows[0][0], w.rows[1][0], w.rows[2][0]);
+        UAVOrientationControl_get_motor_vals(&m1, &m2, &m3, &m4);
 
-    float m1, m2, m3, m4;
-    UAVAngularVelocityControl_update(delta_t, w.rows[0][0], w.rows[1][0], w.rows[2][0]);
-    UAVAngularVelocityControl_get_motor_vals(&m1, &m2, &m3, &m4);
+        _actuators["m1"] = m1 + _power;
+        _actuators["m2"] = m2 + _power;
+        _actuators["m3"] = m3 + _power;
+        _actuators["m4"] = m4 + _power;
 
-    _actuators["m1"] = m1 + _power;
-    _actuators["m2"] = m2 + _power;
-    _actuators["m3"] = m3 + _power;
-    _actuators["m4"] = m4 + _power;
+        t_sum = 0;
+    }
 }
 
 void QuadCopter::forces_update(float delta_t) {
