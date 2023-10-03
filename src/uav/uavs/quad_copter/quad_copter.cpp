@@ -29,7 +29,7 @@ QuadCopter::QuadCopter() {
     _sensors.push_back(_accelerometer_sensor);
 
     UAVAngularVelocityControl_init();
-    UAVAngularVelocityControl_set_target(0.17, 0, 0);
+    UAVAngularVelocityControl_set_target(0, 0, 0);
 }
 
 QuadCopter::~QuadCopter() {
