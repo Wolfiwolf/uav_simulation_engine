@@ -216,8 +216,7 @@ void QuadCopter::communication_non_blocking_thread()
 }
 
 void QuadCopter::control_pan(float x, float y) {
-    _target_orientation.rows[0][0] = 30.0f * y * 0.01745329f;
-    _target_orientation.rows[1][0] = 30.0f * -x * 0.01745329f;
+    UAVOrientationControl_set_target(30.0f * y * 0.01745329f, 30.0f * -x * 0.01745329f, 0.0f);
 }
 
 void QuadCopter::control_elevation(float val) {
