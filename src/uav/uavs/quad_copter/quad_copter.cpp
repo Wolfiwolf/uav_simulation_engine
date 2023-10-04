@@ -29,7 +29,7 @@ QuadCopter::QuadCopter() {
     _sensors.push_back(_accelerometer_sensor);
 
     UAVOrientationControl_init();
-    UAVOrientationControl_set_target(0.707f, 0, 0);
+    UAVOrientationControl_set_target(0.0f, 0.0f, 0.0f);
 }
 
 QuadCopter::~QuadCopter() {
