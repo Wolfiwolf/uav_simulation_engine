@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <chrono>
 #include <string.h>
+#include <string>
 
 struct SingleSession {
 	bool active;
@@ -337,13 +338,15 @@ static void handle_request(struct Message *msg)
     } else {
         response_msg.crc = MessageHandler_calculate_crc(&response_msg);
 
-        MessageHandler_send_msg(&response_msg);
 
         session_index = get_free_session_index(msg->session_type);
         if (session_index == 0xFF) {
             send_nack(msg);
             return;
         }
+
+        MessageHandler_send_msg(&response_msg);
+        Logger::Log(__func__, std::string("Response to channel ") + std::to_string(response_msg.channel) + " was sent!");
 
         struct SingleSession *session = &_single_sessions[session_index];
         session->active = true;
@@ -481,6 +484,8 @@ static void send_nack(struct Message *msg)
 	nack_msg.crc = MessageHandler_calculate_crc(&nack_msg);
 
 	MessageHandler_send_msg(&nack_msg);
+
+    Logger::Log(__func__, "Nack has been sent");
 }
 
 static void send_ack(struct Message *msg)
@@ -493,6 +498,7 @@ static void send_ack(struct Message *msg)
 	ack_msg.crc = MessageHandler_calculate_crc(&ack_msg);
 
 	MessageHandler_send_msg(&ack_msg);
+    Logger::Log(__func__, "Ack has been sent");
 }
 
 static void manage_existing_sessions() {
@@ -562,8 +568,6 @@ void MessageHandler_send_msg(struct Message *msg)
 	MessageHandler_message_to_bytes(msg, data, &len, true);
 
 	_data_link->send_to_gs(data, len);
-
-    Logger::Log(__func__, "Message was sent!");
 }
 
 uint32_t MessageHandler_calculate_crc(struct Message *msg)
