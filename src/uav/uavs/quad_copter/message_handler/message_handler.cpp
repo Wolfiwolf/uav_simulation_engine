@@ -240,22 +240,13 @@ static void handle_command(struct Message *msg)
     bool res = false;
     switch (msg->channel)
     {
-        case COMMAND_GYRO_TOGGLE_CALIBRATION:
-            res = true;
-            break;
         case COMMAND_GYRO_SET_OFFSETS:
-            res = true;
-            break;
-        case COMMAND_ACCELEROMETER_TOGGLE_CALIBRATION:
             res = true;
             break;
         case COMMAND_ACCELEROMETER_SET_OFFSETS:
             res = true;
             break;
         case COMMAND_ACCELEROMETER_SET_SCALERS:
-            res = true;
-            break;
-        case COMMAND_MAGNETOMETER_TOGGLE_CALIBRATION:
             res = true;
             break;
         case COMMAND_MAGNETOMETER_SET_HARD_IRON_BIAS:
@@ -333,10 +324,10 @@ static void handle_request(struct Message *msg)
 	 	handle_request_marco(response_msg.data, &response_msg.data_len);
         res = true;
 		break;
-	case REQUEST_GET_TIMESTAMP:
+	case REQUEST_TIMESTAMP:
         res = true;
 		break;
-	case REQUEST_GET_ALIVE_TIME:
+	case REQUEST_ALIVE_TIME:
         res = true;
 		break;
 	}
