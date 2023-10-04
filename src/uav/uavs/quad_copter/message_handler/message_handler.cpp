@@ -562,6 +562,8 @@ void MessageHandler_send_msg(struct Message *msg)
 	MessageHandler_message_to_bytes(msg, data, &len, true);
 
 	_data_link->send_to_gs(data, len);
+
+    Logger::Log(__func__, "Message was sent!");
 }
 
 uint32_t MessageHandler_calculate_crc(struct Message *msg)
