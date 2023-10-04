@@ -1,4 +1,5 @@
 #include "message_handler.hpp"
+#include "../../../../logger/logger.hpp"
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -108,10 +109,13 @@ void MessageHandler_init(DataLink *data_link, QuadCopter *quad_copter)
 
 static void handle_msg(struct Message *msg)
 {
+    Logger::Log(__func__, "Message was received!");
+
 	uint8_t crc = MessageHandler_calculate_crc(msg);
 
 	if (crc != msg->crc)
 	{
+        Logger::Log(__func__, "Message is invalid. CRC is not correct!", LogLevel::DANGER);
 		send_nack(msg);
 		return;
 	}

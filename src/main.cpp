@@ -4,6 +4,7 @@
 #include "streamer/streamer.hpp"
 #include "uav/uavs/quad_copter/quad_copter.hpp"
 #include "uav_math/uav_math.hpp"
+#include "logger/logger.hpp"
 #include <chrono> 
 #include <string>
 #include <thread>

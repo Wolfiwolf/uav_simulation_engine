@@ -1,8 +1,8 @@
 #include "quad_copter.hpp"
 #include "message_handler/message_handler.hpp"
 #include <cstdlib>
-#include <cstring>
-#include <iostream>
+#include <cstring> 
+#include "../../../logger/logger.hpp"
 #include <chrono>
 #include <cmath>
 #include "../../../uav_math/uav_math.hpp"
@@ -190,9 +190,9 @@ void QuadCopter::moments_update(float delta_t) {
 void QuadCopter::communication_thread() {
     MessageHandler_init(_data_link, this);
     while(true) {
-        std::cout << "Waiting for link...\n";
+        Logger::Log(__func__, "Waiting for link...");
         _data_link->wait_for_link();
-        std::cout << "Link established!\n";
+        Logger::Log(__func__, "Link established!");
 
         uint8_t rx_buffer[1024];
         while(true) {
