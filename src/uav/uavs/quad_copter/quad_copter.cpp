@@ -5,9 +5,11 @@
 #include "../../../logger/logger.hpp"
 #include <chrono>
 #include <cmath>
+#include <string>
 #include <vector>
 #include "../../../uav_math/uav_math.hpp"
 #include "../../../submodules/uav_orientation_control/uav_orientation_control.h"
+#include "../../../submodules/uav_altitude_control/uav_altitude_control.h"
 
 QuadCopter::QuadCopter() {
 	_power = 0.5f;
@@ -23,14 +25,16 @@ QuadCopter::QuadCopter() {
 	_actuators["m3"] = 1.0f;
 	_actuators["m4"] = 1.0f;
 
-	_gyro_sensor = new GyroSensor(this, 1.0f);
-    _accelerometer_sensor = new AccelerometerSensor(this, 1.0f);
+	_gyro_sensor = new GyroSensor(this, 0.0f);
+    _accelerometer_sensor = new AccelerometerSensor(this, 0.0f);
 
 	_sensors.push_back(_gyro_sensor);
     _sensors.push_back(_accelerometer_sensor);
 
     UAVOrientationControl_init();
-    UAVOrientationControl_set_target(0.707f, 0.0f, 0.0f);
+    UAVOrientationControl_set_target(0.0f, 0.0f, 0.0f);
+    UAVAltitudeControl_init();
+    UAVAltitudeControl_set_target(280.0f);
 }
 
 QuadCopter::~QuadCopter() {
@@ -102,16 +106,17 @@ void QuadCopter::control_update(float delta_t) {
 
     if (t_sum > 0.01) {
         struct Matrix euler_angles = get_orientation_euler_angles_ZYX();
-        // struct Matrix w = get_angular_velocity();
         std::vector<float> gyro_vals = _gyro_sensor->get_data();
 
-
-        struct Matrix pos = get_position();
+        struct Matrix pos = get_position_geodetic();
 
         float m1, m2, m3, m4;
-        // UAVOrientationControl_update(t_sum, euler_angles.rows[0][0], euler_angles.rows[1][0], euler_angles.rows[2][0], w.rows[0][0], w.rows[1][0], w.rows[2][0]);
         UAVOrientationControl_update(t_sum, euler_angles.rows[0][0], euler_angles.rows[1][0], euler_angles.rows[2][0], gyro_vals[0], gyro_vals[1], gyro_vals[2]);
+        UAVAltitudeControl_update(t_sum, pos.rows[2][0]);
         UAVOrientationControl_get_motor_vals(&m1, &m2, &m3, &m4);
+        UAVAltitudeControl_get_power(&_power);
+        Logger::Log(__func__, std::string("ALT: ") + std::to_string(pos.rows[2][0]));
+        Logger::Log(__func__, std::string("POWER: ") + std::to_string(_power));
 
         _actuators["m1"] = m1 + _power;
         _actuators["m2"] = m2 + _power;

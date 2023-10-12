@@ -1,3 +1,6 @@
 [submodule "src/submodules/uav_orientation_control"]
 	path = src/submodules/uav_orientation_control
 	url = https://gitlab.com/uav5505023/submodules/cc/uav_orientation_control.git
+[submodule "src/submodules/uav_altitude_control"]
+	path = src/submodules/uav_altitude_control
+	url = https://gitlab.com/uav5505023/submodules/cc/uav_altitude_control.git
