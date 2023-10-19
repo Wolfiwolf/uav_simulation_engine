@@ -5,6 +5,7 @@
 #include "../../../logger/logger.hpp"
 #include <chrono>
 #include <cmath>
+#include <math.h>
 #include <string>
 #include <vector>
 #include "../../../uav_math/uav_math.hpp"
@@ -14,7 +15,8 @@
 QuadCopter::QuadCopter() {
 	_power = 0.5f;
 
-	_target_altitude = 10.0f;
+	_target_altitude = 273.0f;
+    _altitude_control = 0.0f;
     uav_matrix_init(&_target_orientation, 3, 1);
     for (uint8_t i = 0; i < 3; ++i) 
         _target_orientation.rows[i][0] = 0.0f;
@@ -34,7 +36,7 @@ QuadCopter::QuadCopter() {
     UAVOrientationControl_init();
     UAVOrientationControl_set_target(0.0f, 0.0f, 0.0f);
     UAVAltitudeControl_init();
-    UAVAltitudeControl_set_target(280.0f);
+    UAVAltitudeControl_set_target(_target_altitude);
 }
 
 QuadCopter::~QuadCopter() {
@@ -105,23 +107,35 @@ void QuadCopter::control_update(float delta_t) {
     t_sum += delta_t;
 
     if (t_sum > 0.01) {
+
+        _target_altitude += _altitude_control * delta_t;
+
         struct Matrix euler_angles = get_orientation_euler_angles_ZYX();
         std::vector<float> gyro_vals = _gyro_sensor->get_data();
 
-        struct Matrix pos = get_position_geodetic();
+        struct Matrix orientation = get_orientation_euler_angles_ZYX();
+        // struct Matrix pos = get_position_geodetic();
+        struct Matrix pos = get_position();
+
+        float alt = pos.rows[2][0] + 270.0f;
+
 
         float m1, m2, m3, m4;
         UAVOrientationControl_update(t_sum, euler_angles.rows[0][0], euler_angles.rows[1][0], euler_angles.rows[2][0], gyro_vals[0], gyro_vals[1], gyro_vals[2]);
-        UAVAltitudeControl_update(t_sum, pos.rows[2][0]);
+        UAVAltitudeControl_update(t_sum, alt);
         UAVOrientationControl_get_motor_vals(&m1, &m2, &m3, &m4);
         UAVAltitudeControl_get_power(&_power);
-        Logger::Log(__func__, std::string("ALT: ") + std::to_string(pos.rows[2][0]));
-        Logger::Log(__func__, std::string("POWER: ") + std::to_string(_power));
 
-        _actuators["m1"] = m1 + _power;
-        _actuators["m2"] = m2 + _power;
-        _actuators["m3"] = m3 + _power;
-        _actuators["m4"] = m4 + _power;
+        float power_to_add = 0.3465f / cosf(orientation.rows[0][0]);
+
+        float final_pow = power_to_add + _power;
+        if (final_pow > 1.0f) final_pow = 1.0f;
+        if (final_pow < 0.0f) final_pow = 0.0f;
+
+        _actuators["m1"] = m1 + final_pow;
+        _actuators["m2"] = m2 + final_pow;
+        _actuators["m3"] = m3 + final_pow;
+        _actuators["m4"] = m4 + final_pow;
 
         t_sum = 0;
     }
@@ -230,4 +244,5 @@ void QuadCopter::control_pan(float x, float y) {
 }
 
 void QuadCopter::control_elevation(float val) {
+    _altitude_control = val;
 }

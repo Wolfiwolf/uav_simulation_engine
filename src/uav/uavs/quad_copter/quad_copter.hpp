@@ -11,6 +11,7 @@ class QuadCopter : public UAV {
         AccelerometerSensor *_accelerometer_sensor;
 
 		float _target_altitude;
+		float _altitude_control;
 		struct Matrix _target_orientation;
 	public:
 		QuadCopter();
