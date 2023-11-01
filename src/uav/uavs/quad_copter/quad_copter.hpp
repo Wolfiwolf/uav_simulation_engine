@@ -2,6 +2,7 @@
 #include "../../uav.hpp"
 #include "../../sensor/sensors/gyro_sensor/gyro_sensor.hpp"
 #include "../../sensor/sensors/accelerometer_sensor/accelerometer_sensor.hpp"
+#include "../../sensor/sensors/altimeter_sensor/altimeter_sensor.hpp"
 
 class QuadCopter : public UAV {
 	private:
@@ -9,6 +10,7 @@ class QuadCopter : public UAV {
 
 		GyroSensor *_gyro_sensor;
         AccelerometerSensor *_accelerometer_sensor;
+        AltimeterSensor *_altimeter_sensor;
 
 		float _target_altitude;
 		float _altitude_control;

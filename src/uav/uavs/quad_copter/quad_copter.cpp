@@ -29,9 +29,11 @@ QuadCopter::QuadCopter() {
 
 	_gyro_sensor = new GyroSensor(this, 0.0f);
     _accelerometer_sensor = new AccelerometerSensor(this, 0.0f);
+    _altimeter_sensor = new AltimeterSensor(this, 0.0f);
 
 	_sensors.push_back(_gyro_sensor);
     _sensors.push_back(_accelerometer_sensor);
+    _sensors.push_back(_altimeter_sensor);
 
     UAVOrientationControl_init();
     UAVOrientationControl_set_target(0.0f, 0.0f, 0.0f);
@@ -106,18 +108,13 @@ void QuadCopter::control_update(float delta_t) {
     volatile static float t_sum = 0;
     t_sum += delta_t;
 
-    if (t_sum > 0.01) {
+    if (t_sum > 0.02) {
 
         _target_altitude += _altitude_control * delta_t;
 
         struct Matrix euler_angles = get_orientation_euler_angles_ZYX();
         std::vector<float> gyro_vals = _gyro_sensor->get_data();
-
-        struct Matrix orientation = get_orientation_euler_angles_ZYX();
-        // struct Matrix pos = get_position_geodetic();
-        struct Matrix pos = get_position();
-
-        float alt = pos.rows[2][0] + 270.0f;
+        float alt = _altimeter_sensor->get_data()[0];
 
 
         float m1, m2, m3, m4;
@@ -126,7 +123,7 @@ void QuadCopter::control_update(float delta_t) {
         UAVOrientationControl_get_motor_vals(&m1, &m2, &m3, &m4);
         UAVAltitudeControl_get_power(&_power);
 
-        float power_to_add = 0.3465f / cosf(orientation.rows[0][0]);
+        float power_to_add = 0.3465f / cosf(euler_angles.rows[0][0]);
 
         float final_pow = power_to_add + _power;
         if (final_pow > 1.0f) final_pow = 1.0f;
