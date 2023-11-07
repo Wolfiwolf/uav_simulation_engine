@@ -52,7 +52,6 @@ void run_simulation(UAV *uav) {
 
         streamer.stream_data(t, uav);
 
-        Logger::Log(__func__, std::to_string(t / 1000000.0f));
 	}
 }
 

@@ -13,13 +13,6 @@ void AltimeterSensor::update(uint64_t t) {
     float noise = sinf(t_in_s * 80.0f *  2.0f * PI);
 
     _altitude = pos.rows[2][0] + noise * _noise_level;
-
-    for (uint16_t i = 5000; i != 0; --i) {
-        _altitude_window[i] = _altitude_window[i - 1];
-    }
-    _altitude_window[0] = _altitude;
-
-    _altitude = _altitude_window[5000];
 }
 
 std::vector<float> AltimeterSensor::get_data() {
